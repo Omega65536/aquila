@@ -1,22 +1,23 @@
 #include <stdio.h>
 
-#include "lexer.h"
+#include "chunk.h"
+#include "parser.h"
 #include "token.h"
 
 void test() {
-	char *source = "let a = 2 * (30 + 400) / 5000; print(1 + 1);";
+	char *source = "let a = 2 * (30 + 400) / 5000; print(6 + 7);";
 	Lexer lexer;
 	initLexer(&lexer, source);
-	for (;;) {
-		Token token = getNextToken(&lexer);
-		printTokenType(stdout, &token.type);
-		printf(" ");
-		printToken(stdout, &token);
-		printf("\n");
-		if (token.type == TT_END) {
-			break;
-		}
-	}
+
+	Chunk chunk;
+	initChunk(&chunk);
+
+	Parser parser;
+	initParser(&parser, &lexer, &chunk);
+
+	parse(&parser);
+
+	printChunk(&chunk);
 }
 
 int main(void) {
