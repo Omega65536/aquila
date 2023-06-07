@@ -49,15 +49,15 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 }
 
 void printToken(FILE *file, Token *token) {
-        switch (token->type) {
-                case TT_END:
-                        fprintf(file, "END");
-                        break;
-                case TT_UNKNOWN:
-                        fprintf(file, "UNKNOWN");
-                        break;
-                default:
-                        fprintf(file, "'%.*s'", token->length, token->start);
-                        break;
-        }
+	switch (token->type) {
+		case TT_END:
+			fprintf(file, "END");
+			break;
+		case TT_UNKNOWN:
+			fprintf(file, "UNKNOWN");
+			break;
+		default:
+			fprintf(file, "'%.*s'", token->length, token->start);
+			break;
+	}
 }

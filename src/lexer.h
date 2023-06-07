@@ -5,10 +5,10 @@
 #include "token.h"
 
 typedef struct Lexer {
-        char *start;
-        char *current;
-        bool hasPeeked;
-        Token peekedToken;
+	char *start;
+	char *current;
+	bool hasPeeked;
+	Token peekedToken;
 } Lexer;
 
 void initLexer(Lexer *lexer, char *source);

@@ -4,30 +4,30 @@
 #include <stdio.h>
 
 typedef enum TokenType {
-        TT_END,
-        TT_UNKNOWN,
+	TT_END,
+	TT_UNKNOWN,
 
 	TT_LET,
 	TT_PRINT,
 
 	TT_SEMICOLON,
-        TT_LPAREN,
-        TT_RPAREN,
+	TT_LPAREN,
+	TT_RPAREN,
 
 	TT_EQUAL,
-        TT_PLUS,
-        TT_MINUS,
-        TT_STAR,
-        TT_SLASH,
+	TT_PLUS,
+	TT_MINUS,
+	TT_STAR,
+	TT_SLASH,
 
-        TT_NUMBER,
+	TT_NUMBER,
 	TT_NAME,
 } TokenType;
 
 typedef struct Token {
-        TokenType type;
-        char *start;
-        int length;
+	TokenType type;
+	char *start;
+	int length;
 } Token;
 
 void printTokenType(FILE *file, TokenType *tokenType);
