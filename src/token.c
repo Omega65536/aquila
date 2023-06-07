@@ -9,6 +9,9 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 		case TT_LET:
 			fprintf(file, "'let'");
 			break;
+		case TT_PRINT:
+			fprintf(file, "'print'");
+			break;
 		case TT_SEMICOLON:
 			fprintf(file, "';'");
 			break;

@@ -15,7 +15,7 @@ aquila.o: aquila.c
 	$(CC) $(CFLAGS) -c aquila.c 
 
 lexer.o: lexer.h token.o
-	$(CC) $(CFLAGS) -c lexer.c token.o
+	$(CC) $(CFLAGS) -c lexer.c
 
 token.o: token.h
 	$(CC) $(CFLAGS) -c token.c

@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
+static const char *KW_LET = "let";
+static const char *KW_PRINT = "print";
+
+static Token makeToken(Lexer *lexer, TokenType type);
 static Token advanceLexer(Lexer *lexer);
 
 void initLexer(Lexer *lexer, char *source) {
@@ -51,8 +55,6 @@ Token advanceLexer(Lexer *lexer) {
         lexer->start = lexer->current;
         lexer->current++;
 
-        // printf("LEXER: [%s] - [%s]\n", lexer->start, lexer->current);
-
         switch (ch) {
                 case ';':
                         return makeToken(lexer, TT_SEMICOLON);
@@ -87,9 +89,12 @@ Token advanceLexer(Lexer *lexer) {
 		}
 
 		char* name = lexer->start;
-		if (name[0] == 'l' && name[1] == 'e' && name[2] == 't') {
+		if (strncmp(name, KW_LET, 3) == 0) {
 			return makeToken(lexer, TT_LET);
+		} else if (strncmp(name, KW_PRINT, 3) == 0) {
+			return makeToken(lexer, TT_PRINT);
 		}
+
 		return makeToken(lexer, TT_NAME);
 	}
 

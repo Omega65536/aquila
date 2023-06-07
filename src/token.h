@@ -8,6 +8,7 @@ typedef enum TokenType {
         TT_UNKNOWN,
 
 	TT_LET,
+	TT_PRINT,
 
 	TT_SEMICOLON,
         TT_LPAREN,
