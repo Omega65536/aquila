@@ -5,7 +5,7 @@
 
 typedef enum OpCode {
 	OP_NOOP,
-	OP_RETURN,
+	OP_EXIT,
 	OP_POP,
 
 	OP_CONST,

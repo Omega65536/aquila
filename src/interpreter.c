@@ -5,11 +5,13 @@
 
 //#define DEBUG
 
+static uint32_t next(Interpreter *interpreter);
 static void push(Interpreter *interpreter, int value);
 static int pop(Interpreter *interpreter);
 
 void initInterpreter(Interpreter *interpreter, Chunk *chunk) {
         interpreter->chunk = chunk;
+	interpreter->index = 0;
         interpreter->stack = malloc(4 * sizeof(int));
         interpreter->length = 0;
         interpreter->capacity = 4;
@@ -20,15 +22,16 @@ void freeInterpreter(Interpreter *interpreter) {
 }
 
 int interpret(Interpreter *interpreter) {
-        for (int i = 0; i < interpreter->chunk->length; ++i) {
-		OpCode opCode = interpreter->chunk->code[i];
+	for (;;) {
+		OpCode opCode = next(interpreter);
 		//printf("%d: %d\n", i, opCode);
                 switch (opCode) {
                         case OP_NOOP:
                                 break;
+			case OP_EXIT:
+				return 0;
                         case OP_CONST: {
-                                ++i;
-                                int value = interpreter->chunk->code[i];
+                                int value = next(interpreter);
                                 push(interpreter, value);
                                 break;
                         }
@@ -37,8 +40,7 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_LOAD: {
-				++i;
-				int index = interpreter->chunk->code[i];
+				int index = next(interpreter);
 				push(interpreter, interpreter->stack[index]);
 				break;
 			}
@@ -96,6 +98,10 @@ int interpret(Interpreter *interpreter) {
         }
         //return pop(interpreter);
 	return 0;
+}
+
+static uint32_t next(Interpreter *interpreter) {
+		return interpreter->chunk->code[interpreter->index++];
 }
 
 static void push(Interpreter *interpreter, int value) {

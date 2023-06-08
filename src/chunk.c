@@ -30,8 +30,8 @@ void printChunk(Chunk *chunk) {
 			case OP_NOOP:
 				printf("NOOP");
 				break;
-			case OP_RETURN:
-				printf("RETURN");
+			case OP_EXIT:
+				printf("EXIT");
 				break;
 			case OP_POP:
 				printf("POP");

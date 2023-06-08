@@ -40,6 +40,7 @@ void initParser(Parser *parser, Lexer *lexer, Chunk *chunk) {
 void parse(Parser *parser) {
 	parseBlock(parser);
 	match(parser, TT_END);
+	writeIntoChunk(parser->chunk, OP_EXIT);
 }
 
 static void parseStatement(Parser *parser) {

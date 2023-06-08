@@ -5,6 +5,7 @@
 
 typedef struct Interpreter {
         Chunk *chunk;
+	int index;
         int *stack;
         int length;
         int capacity;
