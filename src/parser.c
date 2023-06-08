@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 static void parseStatement(Parser *parser);
+static void parseBlock(Parser *parser);
 static void parseLet(Parser *parser);
 static void parsePrint(Parser *parser);
 
@@ -25,13 +26,16 @@ void initParser(Parser *parser, Lexer *lexer, Chunk *chunk) {
 }
 
 void parse(Parser *parser) {
-	parseStatement(parser);
+	parseBlock(parser);
 	match(parser, TT_END);
 }
 
 static void parseStatement(Parser *parser) {
 	Token token = peekNextToken(parser->lexer);
 	switch (token.type) {
+		case TT_LCURLY:
+			parseBlock(parser);
+			break;
 		case TT_LET:
 			parseLet(parser);
 			break;
@@ -44,6 +48,18 @@ static void parseStatement(Parser *parser) {
 			fprintf(stderr, "\n");
 			parser->hasError = true;
 	}
+}
+
+static void parseBlock(Parser *parser) {
+	match(parser, TT_LCURLY);
+	for (;;) {
+		Token token = peekNextToken(parser->lexer);
+		if (token.type == TT_RCURLY || token.type == TT_END) {
+			break;
+		}
+		parseStatement(parser);
+	}
+	match(parser, TT_RCURLY);
 }
 
 static void parseLet(Parser *parser) {

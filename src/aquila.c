@@ -6,7 +6,13 @@
 #include "interpreter.h"
 
 void test() {
-	char *source = "print(-33 + 8 * 5);";
+	char *source = 
+		"{"
+		"	print(1);"
+		"	{"
+		"		print(2);"
+		"	}"
+		"}";
 	Lexer lexer;
 	initLexer(&lexer, source);
 

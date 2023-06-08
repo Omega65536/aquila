@@ -21,6 +21,12 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 		case TT_RPAREN:
 			fprintf(file, "')'");
 			break;
+		case TT_LCURLY:
+			fprintf(file, "'{'");
+			break;
+		case TT_RCURLY:
+			fprintf(file, "'}'");
+			break;
 		case TT_EQUAL:
 			fprintf(file, "'='");
 			break;

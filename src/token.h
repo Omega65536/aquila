@@ -13,6 +13,8 @@ typedef enum TokenType {
 	TT_SEMICOLON,
 	TT_LPAREN,
 	TT_RPAREN,
+	TT_LCURLY,
+	TT_RCURLY,
 
 	TT_EQUAL,
 	TT_PLUS,

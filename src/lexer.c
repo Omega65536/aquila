@@ -43,7 +43,7 @@ Token peekNextToken(Lexer *lexer) {
 }
 
 Token advanceLexer(Lexer *lexer) {
-	while (*lexer->current == ' ') {
+	while (isspace(*lexer->current)) {
 		lexer->current++;
 	}
 
@@ -62,6 +62,10 @@ Token advanceLexer(Lexer *lexer) {
 			return makeToken(lexer, TT_LPAREN);
 		case ')':
 			return makeToken(lexer, TT_RPAREN);
+		case '{':
+			return makeToken(lexer, TT_LCURLY);
+		case '}':
+			return makeToken(lexer, TT_RCURLY);
 		case '=':
 			return makeToken(lexer, TT_EQUAL);
 		case '+':
