@@ -33,11 +33,11 @@ void printChunk(Chunk *chunk) {
 			case OP_RETURN:
 				printf("RETURN");
 				break;
+			case OP_POP:
+				printf("POP");
+				break;
 			case OP_CONST:
 				printf("CONST %d", chunk->code[++i]);
-				break;
-			case OP_STORE:
-				printf("STORE %d", chunk->code[++i]);
 				break;
 			case OP_LOAD:
 				printf("LOAD %d", chunk->code[++i]);

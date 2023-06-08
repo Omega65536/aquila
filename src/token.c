@@ -1,5 +1,14 @@
 #include "token.h"
 #include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+bool tokenEqual(Token *a, Token *b) {
+	if (a->length != b->length) {
+		return false;
+	}
+	return strncmp(a->start, b->start, a->length) == 0;
+}
 
 void printTokenType(FILE *file, TokenType *tokenType) {
 	switch (*tokenType) {

@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 typedef enum TokenType {
 	TT_END,
@@ -32,6 +33,7 @@ typedef struct Token {
 	int length;
 } Token;
 
+bool tokenEqual(Token* a, Token *b);
 void printTokenType(FILE *file, TokenType *tokenType);
 void printToken(FILE *file, Token *token);
 

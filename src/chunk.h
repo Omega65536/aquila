@@ -6,9 +6,9 @@
 typedef enum OpCode {
 	OP_NOOP,
 	OP_RETURN,
+	OP_POP,
 
 	OP_CONST,
-	OP_STORE,
 	OP_LOAD,
 
 	OP_PRINT,

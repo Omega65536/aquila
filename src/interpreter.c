@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define DEBUG
+
 static void push(Interpreter *interpreter, int value);
 static int pop(Interpreter *interpreter);
 
@@ -20,6 +22,7 @@ void freeInterpreter(Interpreter *interpreter) {
 int interpret(Interpreter *interpreter) {
         for (int i = 0; i < interpreter->chunk->length; ++i) {
 		OpCode opCode = interpreter->chunk->code[i];
+		//printf("%d: %d\n", i, opCode);
                 switch (opCode) {
                         case OP_NOOP:
                                 break;
@@ -29,20 +32,17 @@ int interpret(Interpreter *interpreter) {
                                 push(interpreter, value);
                                 break;
                         }
-			case OP_STORE: {
-				// TODO: implement me
-				++i;
+			case OP_POP: {
 				pop(interpreter);
 				break;
 			}
 			case OP_LOAD: {
-				// TODO: implement me
 				++i;
-				push(interpreter, 1337);
+				int index = interpreter->chunk->code[i];
+				push(interpreter, interpreter->stack[index]);
 				break;
 			}
 			case OP_PRINT: {
-				++i;
 				int value = pop(interpreter);
 				printf("%d\n", value);
 				break;
@@ -87,12 +87,15 @@ int interpret(Interpreter *interpreter) {
                                 break;
                 }
 #ifdef DEBUG
+		printf("STACK: ");
                 for (int j = 0; j < interpreter->length; ++j) {
-                        printf("%d\n", interpreter->stack[j]);
+                        printf("%d, ", interpreter->stack[j]);
                 }
+		printf("\n");
 #endif
         }
-        return pop(interpreter);
+        //return pop(interpreter);
+	return 0;
 }
 
 static void push(Interpreter *interpreter, int value) {
