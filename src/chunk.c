@@ -43,7 +43,7 @@ void printChunk(Chunk *chunk) {
 				printf("LOAD %d", chunk->code[++i]);
 				break;
 			case OP_PRINT:
-				printf("PRINT %d", chunk->code[++i]);
+				printf("PRINT");
 				break;
 			case OP_ADD:
 				printf("ADD");
@@ -57,7 +57,11 @@ void printChunk(Chunk *chunk) {
 			case OP_DIV:
 				printf("DIV");
 				break;
+			case OP_NEGATE:
+				printf("NEGATE");
+				break;
 			default:
+				printf("UNKNOWN OP: %d", chunk->code[i]);
 				break;
 		}
 		printf("\n");

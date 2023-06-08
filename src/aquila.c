@@ -3,9 +3,10 @@
 #include "chunk.h"
 #include "parser.h"
 #include "token.h"
+#include "interpreter.h"
 
 void test() {
-	char *source = "let a = 2 * (30 + 400) / 5000; print(6 + 7);";
+	char *source = "print(-33 + 8 * 5);";
 	Lexer lexer;
 	initLexer(&lexer, source);
 
@@ -15,9 +16,16 @@ void test() {
 	Parser parser;
 	initParser(&parser, &lexer, &chunk);
 
+        printf("=== PARSING ===\n");
 	parse(&parser);
 
-	printChunk(&chunk);
+        printChunk(&chunk);
+
+        Interpreter interpreter;
+        initInterpreter(&interpreter, &chunk);
+
+        printf("=== INTERPRETING ===\n");
+        interpret(&interpreter);
 }
 
 int main(void) {

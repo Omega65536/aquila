@@ -26,7 +26,6 @@ void initParser(Parser *parser, Lexer *lexer, Chunk *chunk) {
 
 void parse(Parser *parser) {
 	parseStatement(parser);
-	parseStatement(parser);
 	match(parser, TT_END);
 }
 

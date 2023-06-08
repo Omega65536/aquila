@@ -8,8 +8,8 @@ all: aquila
 clean:
 	rm -f aquila *.o
 
-aquila: aquila.o lexer.o token.o chunk.o parser.o
-	$(CC) $(CFLAGS) -o aquila aquila.o lexer.o token.o chunk.o parser.o
+aquila: aquila.o lexer.o token.o chunk.o parser.o interpreter.o
+	$(CC) $(CFLAGS) -o aquila aquila.o lexer.o token.o chunk.o parser.o interpreter.o
 
 aquila.o: aquila.c
 	$(CC) $(CFLAGS) -c aquila.c 
@@ -22,6 +22,9 @@ token.o: token.h
 
 parser.o: parser.h lexer.o chunk.o
 	$(CC) $(CFLAGS) -c parser.c
+
+interpreter.o: interpreter.h chunk.o
+	$(CC) $(CFLAGS) -c interpreter.c
 
 chunk.o: chunk.h
 	$(CC) $(CFLAGS) -c chunk.c
