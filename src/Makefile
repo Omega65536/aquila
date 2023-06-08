@@ -1,30 +1,21 @@
+TARGET = aquila
+
 CC = gcc
 CFLAGS = -std=c11 -pedantic -Wall -Werror -D_XOPEN_SOURCE=700 -g
 
 .PHONY: all clean
+all: $(TARGET)
 
-all: aquila
+OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
+HEADERS = $(wildcard *.h)
 
 clean:
 	rm -f aquila *.o
 
-aquila: aquila.o lexer.o token.o chunk.o parser.o interpreter.o
-	$(CC) $(CFLAGS) -o aquila aquila.o lexer.o token.o chunk.o parser.o interpreter.o
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-aquila.o: aquila.c
-	$(CC) $(CFLAGS) -c aquila.c 
+.PRECIOUS: $(TARGET) $(OBJECTS)
 
-lexer.o: lexer.h token.o
-	$(CC) $(CFLAGS) -c lexer.c
-
-token.o: token.h
-	$(CC) $(CFLAGS) -c token.c
-
-parser.o: parser.h lexer.o chunk.o
-	$(CC) $(CFLAGS) -c parser.c
-
-interpreter.o: interpreter.h chunk.o
-	$(CC) $(CFLAGS) -c interpreter.c
-
-chunk.o: chunk.h
-	$(CC) $(CFLAGS) -c chunk.c
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@

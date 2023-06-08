@@ -3,7 +3,6 @@
 
 #include "chunk.h"
 #include "lexer.h"
-#include "token.h"
 #include <stdbool.h>
 
 typedef struct Parser {

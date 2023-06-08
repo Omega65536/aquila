@@ -1,11 +1,12 @@
-#include "parser.h"
-#include "chunk.h"
-#include "lexer.h"
-#include "token.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "parser.h"
+#include "lexer.h"
+#include "chunk.h"
+#include "token.h"
 
 static void parseStatement(Parser *parser);
 static void parseBlock(Parser *parser);

@@ -37,18 +37,23 @@ Token peekNextToken(Lexer *lexer) {
 	if (lexer->hasPeeked) {
 		return lexer->peekedToken;
 	}
+
 	lexer->hasPeeked = true;
 	lexer->peekedToken = advanceLexer(lexer);
 	return lexer->peekedToken;
 }
 
 Token advanceLexer(Lexer *lexer) {
-	while (isspace(*lexer->current)) {
-		lexer->current++;
-	}
+	for (;;) {
+		if (*lexer->current == '\0') {
+			return makeToken(lexer, TT_END);
+		}
 
-	if (*lexer->current == '\0') {
-		return makeToken(lexer, TT_END);
+		if (!isspace(*lexer->current)) {
+			break;
+		}
+
+		lexer->current++;
 	}
 
 	char ch = *lexer->current;

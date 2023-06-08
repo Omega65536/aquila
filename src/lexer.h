@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "token.h"
 
 typedef struct Lexer {

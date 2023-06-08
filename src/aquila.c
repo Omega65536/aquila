@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "lexer.h"
 #include "chunk.h"
 #include "parser.h"
-#include "token.h"
 #include "interpreter.h"
 
-void test() {
-	FILE *file = fopen("../test.aq", "r");
+char *readSource(char *path) {
+	FILE *file = fopen(path, "r");
 	if (file == NULL) {
 		perror("fopen");
 		exit(EXIT_SUCCESS);
@@ -19,9 +19,14 @@ void test() {
 
 	char *source = malloc(fsize + 1);
 	fread(source, fsize, 1, file);
+	source[fsize] = '\0';
 
 	fclose(file);
 
+	return source;
+}
+
+void run(char *source) {
 	Lexer lexer;
 	initLexer(&lexer, source);
 
@@ -41,10 +46,22 @@ void test() {
 
         printf("=== INTERPRETING ===\n");
         interpret(&interpreter);
+
+	freeChunk(&chunk);
+	freeInterpreter(&interpreter);
 }
 
-int main(void) {
-	printf("aquila 0.0.1\n");
+void test(char *path) {
+	char *source = readSource(path);
+	run(source);
+	free(source);
 
-	test();
+}
+
+int main(int argc, char *argv[]) {
+	if (argc != 2) {
+		fprintf(stderr, "usage: aquila <path>\n");
+		exit(EXIT_FAILURE);
+	}
+	test(argv[1]);
 }
