@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "chunk.h"
 #include "parser.h"
@@ -6,13 +7,21 @@
 #include "interpreter.h"
 
 void test() {
-	char *source = 
-		"{"
-		"	print(1);"
-		"	{"
-		"		print(2);"
-		"	}"
-		"}";
+	FILE *file = fopen("../test.aq", "r");
+	if (file == NULL) {
+		perror("fopen");
+		exit(EXIT_SUCCESS);
+	}
+
+	fseek(file, 0, SEEK_END);
+	long fsize = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	char *source = malloc(fsize + 1);
+	fread(source, fsize, 1, file);
+
+	fclose(file);
+
 	Lexer lexer;
 	initLexer(&lexer, source);
 
