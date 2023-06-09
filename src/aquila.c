@@ -39,6 +39,11 @@ void run(char *source) {
         printf("=== PARSING ===\n");
 	parse(&parser);
 
+	if (parser.hasError) {
+		freeChunk(&chunk);
+		return;
+	}
+
         printChunk(&chunk);
 
         Interpreter interpreter;

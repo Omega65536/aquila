@@ -25,6 +25,7 @@ static int resolveVariable(Parser *parser, Token *name);
 static void enterBlock(Parser *parser);
 static void exitBlock(Parser *parser);
 static void declareVariable(Parser *parser, Token token);
+static void markInitialized(Parser *parser);
 
 void initParser(Parser *parser, Lexer *lexer, Chunk *chunk) {
 	parser->lexer = lexer;
@@ -58,7 +59,7 @@ static void parseStatement(Parser *parser) {
 		default:
 			fprintf(stderr, "Syntax Error: Unexpected token ");
 			printToken(stderr, &token);
-			fprintf(stderr, "\n");
+			fprintf(stderr, " while parsing statement\n");
 			parser->hasError = true;
 	}
 }
@@ -97,6 +98,8 @@ static void parseLet(Parser *parser) {
 	match(parser, TT_EQUAL);
 	parseExpression(parser);
 	match(parser, TT_SEMICOLON);
+
+	markInitialized(parser);
 }
 
 static void parsePrint(Parser *parser) {
@@ -157,31 +160,35 @@ static void parseMultiplication(Parser *parser) {
 
 static void parseUnary(Parser *parser) {
 	Chunk *chunk = parser->chunk;
-	Token token = getNextToken(parser->lexer);
+	Token token = peekNextToken(parser->lexer);
 	if (token.type == TT_NUMBER) {
+		getNextToken(parser->lexer);
 		writeIntoChunk(chunk, OP_CONST);
 		int n = atoi(token.start);
 		writeIntoChunk(chunk, n);
 	} else if (token.type == TT_LPAREN) {
+		getNextToken(parser->lexer);
 		parseAddition(parser);
 		match(parser, TT_RPAREN);
 	} else if (token.type == TT_MINUS) {
+		getNextToken(parser->lexer);
 		parseUnary(parser);
 		writeIntoChunk(chunk, OP_NEGATE);
 	} else if (token.type == TT_NAME) {
+		getNextToken(parser->lexer);
 		writeIntoChunk(parser->chunk, OP_LOAD);
 		int i = resolveVariable(parser, &token);
 		writeIntoChunk(parser->chunk, i);
 	} else {
 		fprintf(stderr, "Syntax Error: Unexpected token ");
 		printToken(stderr, &token);
-		fprintf(stderr, "\n");
+		fprintf(stderr, " while parsing expression\n");
 		parser->hasError = true;
 	}
 }
 
 static Token match(Parser *parser, TokenType type) {
-	Token token = getNextToken(parser->lexer);
+	Token token = peekNextToken(parser->lexer);
 	if (token.type != type) {
 		fprintf(stderr, "Syntax Error: Expected ");
 		printTokenType(stderr, &type);
@@ -189,14 +196,18 @@ static Token match(Parser *parser, TokenType type) {
 		printToken(stderr, &token);
 		fprintf(stderr, "\n");
 		parser->hasError = true;
+		return token;
 	}
-	return token;
+	return getNextToken(parser->lexer);
 }
 
 static int resolveVariable(Parser *parser, Token *name) {
 	for (int i = parser->variableCount - 1; i >= 0; --i) {
 		Variable *variable = &parser->variables[i];
 		if (tokenEqual(&variable->name, name)) {
+			if (variable->depth == -1) {
+				continue;
+			}
 			return i;
 		}
 	}
@@ -222,5 +233,9 @@ static void exitBlock(Parser *parser) {
 static void declareVariable(Parser *parser, Token name) {
 	Variable* variable = &parser->variables[parser->variableCount++];
 	variable->name = name;
-	variable->depth = parser->depth;
+	variable->depth = -1;
+}
+
+static void markInitialized(Parser *parser) {
+	parser->variables[parser->variableCount - 1].depth = parser->depth;
 }
