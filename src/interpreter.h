@@ -2,11 +2,17 @@
 #define INTERPRETE_H
 
 #include "chunk.h"
+#include <stdbool.h>
+
+typedef union Object {
+        int integer;
+        bool boolean;
+} Object;
 
 typedef struct Interpreter {
         Chunk *chunk;
 	int index;
-        int *stack;
+        Object *stack;
         int length;
         int capacity;
 } Interpreter;

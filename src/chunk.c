@@ -36,14 +36,23 @@ void printChunk(Chunk *chunk) {
 			case OP_POP:
 				printf("POP");
 				break;
-			case OP_CONST:
-				printf("CONST %d", chunk->code[++i]);
+			case OP_PUSH_INTEGER:
+				printf("PUSH_INTEGER %d", chunk->code[++i]);
+				break;
+			case OP_PUSH_TRUE:
+				printf("PUSH_TRUE");
+				break;
+			case OP_PUSH_FALSE:
+				printf("PUSH_FALSE");
 				break;
 			case OP_LOAD:
 				printf("LOAD %d", chunk->code[++i]);
 				break;
-			case OP_PRINT:
-				printf("PRINT");
+			case OP_PRINT_INTEGER:
+				printf("PRINT_INTEGER");
+				break;
+			case OP_PRINT_BOOLEAN:
+				printf("PRINT_BOOLEAN");
 				break;
 			case OP_ADD:
 				printf("ADD");
@@ -59,6 +68,24 @@ void printChunk(Chunk *chunk) {
 				break;
 			case OP_NEGATE:
 				printf("NEGATE");
+				break;
+			case OP_EQUAL:
+				printf("EQUAL");
+				break;
+			case OP_NOT_EQUAL:
+				printf("NOT_EQUAL");
+				break;
+			case OP_LESS:
+				printf("LESS");
+				break;
+			case OP_LESS_EQUAL:
+				printf("LESS_EQUAL");
+				break;
+			case OP_GREATER:
+				printf("GREATER");
+				break;
+			case OP_GREATER_EQUAL:
+				printf("GREATER_EQUAL");
 				break;
 			default:
 				printf("UNKNOWN OP: %d", chunk->code[i]);

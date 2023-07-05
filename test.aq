@@ -1,8 +1,5 @@
 {
-	let a = 1;
-	{
-		let a = a + 1;
-		print(a);
-	}
-	print(a);
+    let x: integer = 2;
+    let y: integer = 3;
+    print(x * y);
 }

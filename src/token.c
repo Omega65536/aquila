@@ -12,17 +12,37 @@ bool tokenEqual(Token *a, Token *b) {
 
 void printTokenType(FILE *file, TokenType *tokenType) {
 	switch (*tokenType) {
+                // Special
 		case TT_END:
 			fprintf(file, "End");
 			break;
+
+                // Keywords
 		case TT_LET:
 			fprintf(file, "'let'");
 			break;
 		case TT_PRINT:
 			fprintf(file, "'print'");
 			break;
+		case TT_TRUE:
+			fprintf(file, "'true'");
+			break;
+		case TT_FALSE:
+			fprintf(file, "'false'");
+			break;
+		case TT_INTEGER:
+			fprintf(file, "'integer'");
+			break;
+		case TT_BOOLEAN:
+			fprintf(file, "'boolean'");
+			break;
+
+                // Delimiter
 		case TT_SEMICOLON:
 			fprintf(file, "';'");
+			break;
+		case TT_COLON:
+			fprintf(file, "':'");
 			break;
 		case TT_LPAREN:
 			fprintf(file, "'('");
@@ -36,6 +56,8 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 		case TT_RCURLY:
 			fprintf(file, "'}'");
 			break;
+
+                // Operator
 		case TT_EQUAL:
 			fprintf(file, "'='");
 			break;
@@ -51,6 +73,27 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 		case TT_SLASH:
 			fprintf(file, "'/'");
 			break;
+
+                case TT_DOUBLE_EQUAL:
+                        fprintf(file, "'=='");
+                        break;
+                case TT_NOT_EQUAL:
+                        fprintf(file, "'!='");
+                        break;
+                case TT_LESS:
+                        fprintf(file, "'<'");
+                        break;
+                case TT_LESS_EQUAL:
+                        fprintf(file, "'<='");
+                        break;
+                case TT_GREATER:
+                        fprintf(file, "'>'");
+                        break;
+                case TT_GREATER_EQUAL:
+                        fprintf(file, "'>='");
+                        break;
+
+                // Other
 		case TT_NUMBER:
 			fprintf(file, "Number");
 			break;
