@@ -7,9 +7,14 @@
 
 static const char *KW_LET = "let";
 static const char *KW_PRINT = "print";
+static const char *KW_TRUE = "true";
+static const char *KW_FALSE = "false";
+static const char *KW_INTEGER = "integer";
+static const char *KW_BOOLEAN = "boolean";
 
 static Token makeToken(Lexer *lexer, TokenType type);
 static Token advanceLexer(Lexer *lexer);
+static char nextChar(Lexer *lexer);
 
 void initLexer(Lexer *lexer, char *source) {
 	lexer->start = source;
@@ -56,13 +61,14 @@ Token advanceLexer(Lexer *lexer) {
 		lexer->current++;
 	}
 
-	char ch = *lexer->current;
 	lexer->start = lexer->current;
-	lexer->current++;
+        char ch = nextChar(lexer);
 
 	switch (ch) {
 		case ';':
 			return makeToken(lexer, TT_SEMICOLON);
+                case ':':
+			return makeToken(lexer, TT_COLON);
 		case '(':
 			return makeToken(lexer, TT_LPAREN);
 		case ')':
@@ -72,6 +78,10 @@ Token advanceLexer(Lexer *lexer) {
 		case '}':
 			return makeToken(lexer, TT_RCURLY);
 		case '=':
+                        if (*lexer->current == '=') {
+                            nextChar(lexer);
+                            return makeToken(lexer, TT_DOUBLE_EQUAL);
+                        }
 			return makeToken(lexer, TT_EQUAL);
 		case '+':
 			return makeToken(lexer, TT_PLUS);
@@ -81,6 +91,24 @@ Token advanceLexer(Lexer *lexer) {
 			return makeToken(lexer, TT_STAR);
 		case '/':
 			return makeToken(lexer, TT_SLASH);
+                case '!':
+                        if (*lexer->current == '=') {
+                            nextChar(lexer);
+                            return makeToken(lexer, TT_NOT_EQUAL);
+                        }
+                        break;
+                case '<':
+                        if (*lexer->current == '=') {
+                            nextChar(lexer);
+                            return makeToken(lexer, TT_LESS_EQUAL);
+                        }
+                        return makeToken(lexer, TT_LESS);
+                case '>':
+                        if (*lexer->current == '=') {
+                            nextChar(lexer);
+                            return makeToken(lexer, TT_GREATER_EQUAL);
+                        }
+                        return makeToken(lexer, TT_GREATER);
 		default:
 			break;
 	}
@@ -98,14 +126,28 @@ Token advanceLexer(Lexer *lexer) {
 		}
 
 		char *name = lexer->start;
-		if (strncmp(name, KW_LET, 3) == 0) {
+		if (strncmp(name, KW_LET, strlen(KW_LET)) == 0) {
 			return makeToken(lexer, TT_LET);
-		} else if (strncmp(name, KW_PRINT, 3) == 0) {
+		} else if (strncmp(name, KW_PRINT, strlen(KW_PRINT)) == 0) {
 			return makeToken(lexer, TT_PRINT);
+		} else if (strncmp(name, KW_TRUE, strlen(KW_TRUE)) == 0) {
+			return makeToken(lexer, TT_TRUE);
+		} else if (strncmp(name, KW_FALSE, strlen(KW_FALSE)) == 0) {
+			return makeToken(lexer, TT_FALSE);
+		} else if (strncmp(name, KW_INTEGER, strlen(KW_INTEGER)) == 0) {
+			return makeToken(lexer, TT_INTEGER);
+		} else if (strncmp(name, KW_BOOLEAN, strlen(KW_BOOLEAN)) == 0) {
+			return makeToken(lexer, TT_BOOLEAN);
 		}
 
 		return makeToken(lexer, TT_NAME);
 	}
 
 	return makeToken(lexer, TT_UNKNOWN);
+}
+
+static char nextChar(Lexer *lexer) {
+	char ch = *lexer->current;
+	lexer->current++;
+        return ch;
 }
