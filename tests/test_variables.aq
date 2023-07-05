@@ -1,0 +1,18 @@
+{
+    let a: integer = 1000;
+    let b: boolean = true;
+
+    {
+        let a: boolean = false;
+        let b: integer = 2000;
+
+        print(a);
+        print(b);
+    }
+
+    print(a);
+    print(b);
+
+    let c: integer = 3000;
+    print(c);
+}
