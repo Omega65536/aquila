@@ -38,6 +38,7 @@ static void mark_initializied(Compiler *compiler);
 
 static void push_type(Compiler *compiler, Type type);
 static Type pop_type(Compiler *compiler); 
+static void match_type(Compiler *compiler, Type expected);
 static void type_error(Type expected, Type found);
 
 void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
@@ -222,14 +223,8 @@ static void compile_addition(Compiler *compiler) {
         get_next_token(compiler->lexer);
         compile_multiplication_and_division(compiler);
 
-        Type first_type = pop_type(compiler);
-        if (first_type != TY_INTEGER) {
-		type_error(TY_INTEGER, first_type);
-        }
-        Type second_type = pop_type(compiler);
-        if (second_type != TY_INTEGER) {
-		type_error(TY_INTEGER, first_type);
-        }
+        match_type(compiler, TY_INTEGER);
+        match_type(compiler, TY_INTEGER);
         push_type(compiler, TY_INTEGER);
 
         write_into_chunk(compiler->chunk, OP_ADD);
@@ -239,14 +234,8 @@ static void compile_subtraction(Compiler *compiler) {
         get_next_token(compiler->lexer);
         compile_multiplication_and_division(compiler);
 
-        Type first_type = pop_type(compiler);
-        if (first_type != TY_INTEGER) {
-		type_error(TY_INTEGER, first_type);
-        }
-        Type second_type = pop_type(compiler);
-        if (second_type != TY_INTEGER) {
-		type_error(TY_INTEGER, second_type);
-        }
+        match_type(compiler, TY_INTEGER);
+        match_type(compiler, TY_INTEGER);
         push_type(compiler, TY_INTEGER);
 
         write_into_chunk(compiler->chunk, OP_SUB);
@@ -273,14 +262,8 @@ static void compile_multiplication(Compiler *compiler) {
         get_next_token(compiler->lexer);
         compile_unary(compiler);
 
-        Type first_type = pop_type(compiler);
-        if (first_type != TY_INTEGER) {
-		type_error(TY_INTEGER, first_type);
-        }
-        Type second_type = pop_type(compiler);
-        if (second_type != TY_INTEGER) {
-		type_error(TY_INTEGER, second_type);
-        }
+        match_type(compiler, TY_INTEGER);
+        match_type(compiler, TY_INTEGER);
         push_type(compiler, TY_INTEGER);
 
         write_into_chunk(compiler->chunk, OP_MUL);
@@ -290,14 +273,8 @@ static void compile_division(Compiler *compiler) {
         get_next_token(compiler->lexer);
         compile_unary(compiler);
 
-        Type first_type = pop_type(compiler);
-        if (first_type != TY_INTEGER) {
-		type_error(TY_INTEGER, first_type);
-        }
-        Type second_type = pop_type(compiler);
-        if (second_type != TY_INTEGER) {
-		type_error(TY_INTEGER, second_type);
-        }
+        match_type(compiler, TY_INTEGER);
+        match_type(compiler, TY_INTEGER);
         push_type(compiler, TY_INTEGER);
 
         write_into_chunk(compiler->chunk, OP_DIV);
@@ -361,12 +338,9 @@ static void compile_name(Compiler *compiler) {
 
 static void compile_negation(Compiler *compiler) {
 	get_next_token(compiler->lexer);
-	compile_division(compiler);
+	compile_unary(compiler);
 
-        Type type = pop_type(compiler);
-        if (type != TY_INTEGER) {
-		type_error(TY_INTEGER, type);
-        }
+        match_type(compiler, TY_INTEGER);
         push_type(compiler, TY_INTEGER);
 
 	write_into_chunk(compiler->chunk, OP_NEGATE);
@@ -431,6 +405,13 @@ static void push_type(Compiler *compiler, Type type) {
 
 static Type pop_type(Compiler *compiler) {
         return compiler->type_stack[--compiler->type_stackSize];
+}
+
+static void match_type(Compiler *compiler, Type expected) {
+        Type found = pop_type(compiler);
+        if (found != expected) {
+                type_error(expected, found);
+        }
 }
 
 static void type_error(Type expected, Type found) {
