@@ -6,7 +6,7 @@
 #include "compiler.h"
 #include "interpreter.h"
 
-char *readSource(char *path) {
+char *read_source(char *path) {
 	FILE *file = fopen(path, "r");
 	if (file == NULL) {
 		perror("fopen");
@@ -28,31 +28,31 @@ char *readSource(char *path) {
 
 void run(char *source) {
 	Lexer lexer;
-	initLexer(&lexer, source);
+	init_lexer(&lexer, source);
 
 	Chunk chunk;
-	initChunk(&chunk);
+	init_chunk(&chunk);
 
 	Compiler compiler;
-	initCompiler(&compiler, &lexer, &chunk);
+	init_compiler(&compiler, &lexer, &chunk);
 
         printf("=== PARSING ===\n");
 	compile(&compiler);
 
-        printChunk(&chunk);
+        print_chunk(&chunk);
 
         Interpreter interpreter;
-        initInterpreter(&interpreter, &chunk);
+        init_interpreter(&interpreter, &chunk);
 
-        printf("=== INTERPRETING ===\n");
+        printf("=== COMPILING ===\n");
         interpret(&interpreter);
 
-	freeChunk(&chunk);
-	freeInterpreter(&interpreter);
+	free_chunk(&chunk);
+	free_interpreter(&interpreter);
 }
 
 void test(char *path) {
-	char *source = readSource(path);
+	char *source = read_source(path);
 	run(source);
 	free(source);
 

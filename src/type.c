@@ -1,7 +1,7 @@
 #include "type.h"
 #include <stdio.h>
 
-void printType(FILE *file, Type type) {
+void print_type(FILE *file, Type type) {
     switch (type) {
         case TY_INTEGER:
             fprintf(file, "Integer");

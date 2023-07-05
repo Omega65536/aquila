@@ -12,17 +12,17 @@ static const char *KW_FALSE = "false";
 static const char *KW_INTEGER = "integer";
 static const char *KW_BOOLEAN = "boolean";
 
-static Token makeToken(Lexer *lexer, TokenType type);
-static Token advanceLexer(Lexer *lexer);
-static char nextChar(Lexer *lexer);
+static Token make_token(Lexer *lexer, TokenType type);
+static Token advance_lexer(Lexer *lexer);
+static char next_char(Lexer *lexer);
 
-void initLexer(Lexer *lexer, char *source) {
+void init_lexer(Lexer *lexer, char *source) {
 	lexer->start = source;
 	lexer->current = source;
-	lexer->hasPeeked = false;
+	lexer->has_peeked = false;
 }
 
-Token makeToken(Lexer *lexer, TokenType type) {
+Token make_token(Lexer *lexer, TokenType type) {
 	Token token;
 	token.type = type;
 	token.start = lexer->start;
@@ -30,28 +30,28 @@ Token makeToken(Lexer *lexer, TokenType type) {
 	return token;
 }
 
-Token getNextToken(Lexer *lexer) {
-	if (lexer->hasPeeked) {
-		lexer->hasPeeked = false;
-		return lexer->peekedToken;
+Token get_next_token(Lexer *lexer) {
+	if (lexer->has_peeked) {
+		lexer->has_peeked = false;
+		return lexer->peeked_token;
 	}
-	return advanceLexer(lexer);
+	return advance_lexer(lexer);
 }
 
-Token peekNextToken(Lexer *lexer) {
-	if (lexer->hasPeeked) {
-		return lexer->peekedToken;
+Token peek_next_token(Lexer *lexer) {
+	if (lexer->has_peeked) {
+		return lexer->peeked_token;
 	}
 
-	lexer->hasPeeked = true;
-	lexer->peekedToken = advanceLexer(lexer);
-	return lexer->peekedToken;
+	lexer->has_peeked = true;
+	lexer->peeked_token = advance_lexer(lexer);
+	return lexer->peeked_token;
 }
 
-Token advanceLexer(Lexer *lexer) {
+Token advance_lexer(Lexer *lexer) {
 	for (;;) {
 		if (*lexer->current == '\0') {
-			return makeToken(lexer, TT_END);
+			return make_token(lexer, TT_END);
 		}
 
 		if (!isspace(*lexer->current)) {
@@ -62,53 +62,53 @@ Token advanceLexer(Lexer *lexer) {
 	}
 
 	lexer->start = lexer->current;
-        char ch = nextChar(lexer);
+        char ch = next_char(lexer);
 
 	switch (ch) {
 		case ';':
-			return makeToken(lexer, TT_SEMICOLON);
+			return make_token(lexer, TT_SEMICOLON);
                 case ':':
-			return makeToken(lexer, TT_COLON);
+			return make_token(lexer, TT_COLON);
 		case '(':
-			return makeToken(lexer, TT_LPAREN);
+			return make_token(lexer, TT_LPAREN);
 		case ')':
-			return makeToken(lexer, TT_RPAREN);
+			return make_token(lexer, TT_RPAREN);
 		case '{':
-			return makeToken(lexer, TT_LCURLY);
+			return make_token(lexer, TT_LCURLY);
 		case '}':
-			return makeToken(lexer, TT_RCURLY);
+			return make_token(lexer, TT_RCURLY);
 		case '=':
                         if (*lexer->current == '=') {
-                            nextChar(lexer);
-                            return makeToken(lexer, TT_DOUBLE_EQUAL);
+                            next_char(lexer);
+                            return make_token(lexer, TT_DOUBLE_EQUAL);
                         }
-			return makeToken(lexer, TT_EQUAL);
+			return make_token(lexer, TT_EQUAL);
 		case '+':
-			return makeToken(lexer, TT_PLUS);
+			return make_token(lexer, TT_PLUS);
 		case '-':
-			return makeToken(lexer, TT_MINUS);
+			return make_token(lexer, TT_MINUS);
 		case '*':
-			return makeToken(lexer, TT_STAR);
+			return make_token(lexer, TT_STAR);
 		case '/':
-			return makeToken(lexer, TT_SLASH);
+			return make_token(lexer, TT_SLASH);
                 case '!':
                         if (*lexer->current == '=') {
-                            nextChar(lexer);
-                            return makeToken(lexer, TT_NOT_EQUAL);
+                            next_char(lexer);
+                            return make_token(lexer, TT_NOT_EQUAL);
                         }
                         break;
                 case '<':
                         if (*lexer->current == '=') {
-                            nextChar(lexer);
-                            return makeToken(lexer, TT_LESS_EQUAL);
+                            next_char(lexer);
+                            return make_token(lexer, TT_LESS_EQUAL);
                         }
-                        return makeToken(lexer, TT_LESS);
+                        return make_token(lexer, TT_LESS);
                 case '>':
                         if (*lexer->current == '=') {
-                            nextChar(lexer);
-                            return makeToken(lexer, TT_GREATER_EQUAL);
+                            next_char(lexer);
+                            return make_token(lexer, TT_GREATER_EQUAL);
                         }
-                        return makeToken(lexer, TT_GREATER);
+                        return make_token(lexer, TT_GREATER);
 		default:
 			break;
 	}
@@ -117,7 +117,7 @@ Token advanceLexer(Lexer *lexer) {
 		while (isdigit(*lexer->current)) {
 			lexer->current++;
 		}
-		return makeToken(lexer, TT_NUMBER);
+		return make_token(lexer, TT_NUMBER);
 	}
 
 	if (isalpha(ch)) {
@@ -127,26 +127,26 @@ Token advanceLexer(Lexer *lexer) {
 
 		char *name = lexer->start;
 		if (strncmp(name, KW_LET, strlen(KW_LET)) == 0) {
-			return makeToken(lexer, TT_LET);
+			return make_token(lexer, TT_LET);
 		} else if (strncmp(name, KW_PRINT, strlen(KW_PRINT)) == 0) {
-			return makeToken(lexer, TT_PRINT);
+			return make_token(lexer, TT_PRINT);
 		} else if (strncmp(name, KW_TRUE, strlen(KW_TRUE)) == 0) {
-			return makeToken(lexer, TT_TRUE);
+			return make_token(lexer, TT_TRUE);
 		} else if (strncmp(name, KW_FALSE, strlen(KW_FALSE)) == 0) {
-			return makeToken(lexer, TT_FALSE);
+			return make_token(lexer, TT_FALSE);
 		} else if (strncmp(name, KW_INTEGER, strlen(KW_INTEGER)) == 0) {
-			return makeToken(lexer, TT_INTEGER);
+			return make_token(lexer, TT_INTEGER);
 		} else if (strncmp(name, KW_BOOLEAN, strlen(KW_BOOLEAN)) == 0) {
-			return makeToken(lexer, TT_BOOLEAN);
+			return make_token(lexer, TT_BOOLEAN);
 		}
 
-		return makeToken(lexer, TT_NAME);
+		return make_token(lexer, TT_NAME);
 	}
 
-	return makeToken(lexer, TT_UNKNOWN);
+	return make_token(lexer, TT_UNKNOWN);
 }
 
-static char nextChar(Lexer *lexer) {
+static char next_char(Lexer *lexer) {
 	char ch = *lexer->current;
 	lexer->current++;
         return ch;

@@ -8,6 +8,6 @@ typedef enum Type {
 	TY_BOOLEAN,
 } Type;
 
-void printType(FILE *file, Type type);
+void print_type(FILE *file, Type type);
 
 #endif

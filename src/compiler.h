@@ -19,14 +19,14 @@ typedef struct Compiler {
 	Chunk *chunk;
 
 	Variable variables[256];
-	int variableCount;
+	int variable_count;
 	int depth;
 
-	Type typeStack[256];
-	int typeStackSize;
+	Type type_stack[256];
+	int type_stackSize;
 } Compiler;
 
-void initCompiler(Compiler *compiler, Lexer *lexer, Chunk *chunk);
+void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk);
 void compile(Compiler *compile);
 
 #endif

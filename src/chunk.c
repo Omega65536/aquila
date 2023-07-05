@@ -3,17 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void initChunk(Chunk *chunk) {
+void init_chunk(Chunk *chunk) {
 	chunk->code = malloc(4 * sizeof(uint32_t));
 	chunk->length = 0;
 	chunk->capacity = 4;
 }
 
-void freeChunk(Chunk *chunk) {
+void free_chunk(Chunk *chunk) {
 	free(chunk->code);
 }
 
-void writeIntoChunk(Chunk *chunk, uint32_t word) {
+void write_into_chunk(Chunk *chunk, uint32_t word) {
 	if (chunk->length == chunk->capacity) {
 		chunk->capacity *= 2;
 		chunk->code =
@@ -23,7 +23,7 @@ void writeIntoChunk(Chunk *chunk, uint32_t word) {
 	chunk->length++;
 }
 
-void printChunk(Chunk *chunk) {
+void print_chunk(Chunk *chunk) {
 	for (int i = 0; i < chunk->length; ++i) {
 		printf("%-8d", i);
 		switch (chunk->code[i]) {

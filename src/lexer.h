@@ -7,12 +7,12 @@
 typedef struct Lexer {
 	char *start;
 	char *current;
-	bool hasPeeked;
-	Token peekedToken;
+	bool has_peeked;
+	Token peeked_token;
 } Lexer;
 
-void initLexer(Lexer *lexer, char *source);
-Token getNextToken(Lexer *lexer);
-Token peekNextToken(Lexer *lexer);
+void init_lexer(Lexer *lexer, char *source);
+Token get_next_token(Lexer *lexer);
+Token peek_next_token(Lexer *lexer);
 
 #endif

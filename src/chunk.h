@@ -36,9 +36,9 @@ typedef struct Chunk {
 	int capacity;
 } Chunk;
 
-void initChunk(Chunk *chunk);
-void freeChunk(Chunk *chunk);
-void writeIntoChunk(Chunk *chunk, uint32_t word);
-void printChunk(Chunk *chunk);
+void init_chunk(Chunk *chunk);
+void free_chunk(Chunk *chunk);
+void write_into_chunk(Chunk *chunk, uint32_t word);
+void print_chunk(Chunk *chunk);
 
 #endif

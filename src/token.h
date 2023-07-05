@@ -50,8 +50,8 @@ typedef struct Token {
 	int length;
 } Token;
 
-bool tokenEqual(Token* a, Token *b);
-void printTokenType(FILE *file, TokenType *tokenType);
-void printToken(FILE *file, Token *token);
+bool token_equal(Token* a, Token *b);
+void print_token_type(FILE *file, TokenType *token_type);
+void print_token(FILE *file, Token *token);
 
 #endif

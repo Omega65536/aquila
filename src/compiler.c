@@ -10,122 +10,122 @@
 #include "token.h"
 #include "type.h"
 
-static void compileStatement(Compiler *compiler);
-static void compileBlock(Compiler *compiler);
-static void compileLet(Compiler *compiler);
-static Type compileType(Compiler *compiler);
-static void compilePrint(Compiler *compiler);
+static void compile_statement(Compiler *compiler);
+static void compile_block(Compiler *compiler);
+static void compile_let(Compiler *compiler);
+static Type compile_type(Compiler *compiler);
+static void compile_print(Compiler *compiler);
 
-static void compileExpression(Compiler *compiler);
-static void compileComparison(Compiler *compiler);
-static void compileAdditionOrSubtraction(Compiler *compiler);
-static void compileAddition(Compiler *compiler);
-static void compileSubtraction(Compiler *compiler);
-static void compileMultiplicationOrDivision(Compiler *compiler);
-static void compileMultiplication(Compiler *compiler);
-static void compileDivision(Compiler *compiler);
-static void compileUnary(Compiler *compiler);
-static void compileName(Compiler *compiler);
-static void compileNegation(Compiler *compiler);
+static void compile_expression(Compiler *compiler);
+static void compile_comparison(Compiler *compiler);
+static void compile_addition_and_subtraction(Compiler *compiler);
+static void compile_addition(Compiler *compiler);
+static void compile_subtraction(Compiler *compiler);
+static void compile_multiplication_and_division(Compiler *compiler);
+static void compile_multiplication(Compiler *compiler);
+static void compile_division(Compiler *compiler);
+static void compile_unary(Compiler *compiler);
+static void compile_name(Compiler *compiler);
+static void compile_negation(Compiler *compiler);
 
 static Token match(Compiler *compiler, TokenType type);
 
-static int resolveVariable(Compiler *compiler, Token *name);
-static void enterBlock(Compiler *compiler);
-static void exitBlock(Compiler *compiler);
-static void declareVariable(Compiler *compiler, Token name, Type type);
-static void markInitialized(Compiler *compiler);
+static int resolve_variable(Compiler *compiler, Token *name);
+static void enter_block(Compiler *compiler);
+static void exit_block(Compiler *compiler);
+static void declare_variable(Compiler *compiler, Token name, Type type);
+static void mark_initializied(Compiler *compiler);
 
-static void pushType(Compiler *compiler, Type type);
-static Type popType(Compiler *compiler); 
-static void typeError(Type expected, Type found);
+static void push_type(Compiler *compiler, Type type);
+static Type pop_type(Compiler *compiler); 
+static void type_error(Type expected, Type found);
 
-void initCompiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
+void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
 	compiler->lexer = lexer;
 	compiler->chunk = chunk;
 
 	memset(compiler->variables, 0, 256 * sizeof(Variable));
-	compiler->variableCount = 0;
+	compiler->variable_count = 0;
 	compiler->depth = 0;
 
-        compiler->typeStackSize = 0;
+        compiler->type_stackSize = 0;
 }
 
 void compile(Compiler *compiler) {
-	compileBlock(compiler);
+	compile_block(compiler);
 	match(compiler, TT_END);
-	writeIntoChunk(compiler->chunk, OP_EXIT);
+	write_into_chunk(compiler->chunk, OP_EXIT);
 }
 
-static void compileStatement(Compiler *compiler) {
-	Token token = peekNextToken(compiler->lexer);
+static void compile_statement(Compiler *compiler) {
+	Token token = peek_next_token(compiler->lexer);
 	switch (token.type) {
 		case TT_LCURLY:
-			compileBlock(compiler);
+			compile_block(compiler);
 			break;
 		case TT_LET:
-			compileLet(compiler);
+			compile_let(compiler);
 			break;
 		case TT_PRINT:
-			compilePrint(compiler);
+			compile_print(compiler);
 			break;
 		default:
 			fprintf(stderr, "Syntax Error: Unexpected token ");
-			printToken(stderr, &token);
+			print_token(stderr, &token);
 			fprintf(stderr, " while parsing statement\n");
                         exit(EXIT_FAILURE);
 	}
 }
 
-static void compileBlock(Compiler *compiler) {
+static void compile_block(Compiler *compiler) {
 	match(compiler, TT_LCURLY);
-	enterBlock(compiler);
+	enter_block(compiler);
 	for (;;) {
-		Token token = peekNextToken(compiler->lexer);
+		Token token = peek_next_token(compiler->lexer);
 		if (token.type == TT_RCURLY || token.type == TT_END) {
 			break;
 		}
-		compileStatement(compiler);
+		compile_statement(compiler);
 	}
-	exitBlock(compiler);
+	exit_block(compiler);
 	match(compiler, TT_RCURLY);
 }
 
-static void compileLet(Compiler *compiler) {
+static void compile_let(Compiler *compiler) {
 	match(compiler, TT_LET);
 	Token name = match(compiler, TT_NAME);
 
-	for (int i = compiler->variableCount - 1; i >= 0; --i) {
+	for (int i = compiler->variable_count - 1; i >= 0; --i) {
 		Variable *variable = &compiler->variables[i];
 		if (compiler->depth != -1 && variable->depth < compiler->depth) {
 			break;
 		}
 
-		if (tokenEqual(&name, &variable->name)) {
+		if (token_equal(&name, &variable->name)) {
 			fprintf(stderr, "Variable already declared\n");
                         exit(EXIT_FAILURE);
 		}
 	}
 
         match(compiler, TT_COLON);
-        Type type = compileType(compiler);
+        Type type = compile_type(compiler);
 
-	declareVariable(compiler, name, type);
+	declare_variable(compiler, name, type);
 
 	match(compiler, TT_EQUAL);
-	compileExpression(compiler);
+	compile_expression(compiler);
 	match(compiler, TT_SEMICOLON);
 
-        Type expressionType = popType(compiler);
+        Type expressionType = pop_type(compiler);
         if (expressionType != type) {
-            typeError(type, expressionType);
+            type_error(type, expressionType);
         }
 
-	markInitialized(compiler);
+	mark_initializied(compiler);
 }
 
-static Type compileType(Compiler *compiler) {
-        Token token = getNextToken(compiler->lexer);
+static Type compile_type(Compiler *compiler) {
+        Token token = get_next_token(compiler->lexer);
         switch (token.type) {
             case TT_INTEGER:
                 return TY_INTEGER;
@@ -137,32 +137,32 @@ static Type compileType(Compiler *compiler) {
         }           
 }
 
-static void compilePrint(Compiler *compiler) {
+static void compile_print(Compiler *compiler) {
 	match(compiler, TT_PRINT);
 	match(compiler, TT_LPAREN);
-	compileExpression(compiler);
+	compile_expression(compiler);
 	match(compiler, TT_RPAREN);
 	match(compiler, TT_SEMICOLON);
 
-        Type type = popType(compiler);
+        Type type = pop_type(compiler);
         switch (type) {
             case TY_INTEGER:
-                writeIntoChunk(compiler->chunk, OP_PRINT_INTEGER);
+                write_into_chunk(compiler->chunk, OP_PRINT_INTEGER);
                 break;
             case TY_BOOLEAN:
-                writeIntoChunk(compiler->chunk, OP_PRINT_BOOLEAN);
+                write_into_chunk(compiler->chunk, OP_PRINT_BOOLEAN);
                 break;
         }
 }
 
-static void compileExpression(Compiler *compiler) {
-	compileComparison(compiler);
+static void compile_expression(Compiler *compiler) {
+	compile_comparison(compiler);
 }
 
-static void compileComparison(Compiler *compiler) {
-        compileAdditionOrSubtraction(compiler);
+static void compile_comparison(Compiler *compiler) {
+        compile_addition_and_subtraction(compiler);
         OpCode comparison;
-        Token token = peekNextToken(compiler->lexer);
+        Token token = peek_next_token(compiler->lexer);
         switch (token.type) {
                 case TT_DOUBLE_EQUAL:
                         comparison = OP_EQUAL;
@@ -185,32 +185,32 @@ static void compileComparison(Compiler *compiler) {
                 default:
                         return;
         }
-        getNextToken(compiler->lexer);
-        compileAdditionOrSubtraction(compiler);
+        get_next_token(compiler->lexer);
+        compile_addition_and_subtraction(compiler);
 
-        Type firstType = popType(compiler);
-        if (firstType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type first_type = pop_type(compiler);
+        if (first_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        Type secondType = popType(compiler);
-        if (secondType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type second_type = pop_type(compiler);
+        if (second_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        pushType(compiler, TY_BOOLEAN);
+        push_type(compiler, TY_BOOLEAN);
 
-        writeIntoChunk(compiler->chunk, comparison);
+        write_into_chunk(compiler->chunk, comparison);
 }
 
-static void compileAdditionOrSubtraction(Compiler *compiler) {
-	compileMultiplicationOrDivision(compiler);
+static void compile_addition_and_subtraction(Compiler *compiler) {
+	compile_multiplication_and_division(compiler);
 	for (;;) {
-		Token token = peekNextToken(compiler->lexer);
+		Token token = peek_next_token(compiler->lexer);
 		switch (token.type) {
 			case TT_PLUS:
-                                compileAddition(compiler);
+                                compile_addition(compiler);
                                 break;
 			case TT_MINUS:
-                                compileSubtraction(compiler);
+                                compile_subtraction(compiler);
 				break;
 			default:
 				return;
@@ -218,50 +218,50 @@ static void compileAdditionOrSubtraction(Compiler *compiler) {
 	}
 }
 
-static void compileAddition(Compiler *compiler) {
-        getNextToken(compiler->lexer);
-        compileMultiplicationOrDivision(compiler);
+static void compile_addition(Compiler *compiler) {
+        get_next_token(compiler->lexer);
+        compile_multiplication_and_division(compiler);
 
-        Type firstType = popType(compiler);
-        if (firstType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type first_type = pop_type(compiler);
+        if (first_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        Type secondType = popType(compiler);
-        if (secondType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type second_type = pop_type(compiler);
+        if (second_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        pushType(compiler, TY_INTEGER);
+        push_type(compiler, TY_INTEGER);
 
-        writeIntoChunk(compiler->chunk, OP_ADD);
+        write_into_chunk(compiler->chunk, OP_ADD);
 }
 
-static void compileSubtraction(Compiler *compiler) {
-        getNextToken(compiler->lexer);
-        compileMultiplicationOrDivision(compiler);
+static void compile_subtraction(Compiler *compiler) {
+        get_next_token(compiler->lexer);
+        compile_multiplication_and_division(compiler);
 
-        Type firstType = popType(compiler);
-        if (firstType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type first_type = pop_type(compiler);
+        if (first_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        Type secondType = popType(compiler);
-        if (secondType != TY_INTEGER) {
-		typeError(TY_INTEGER, secondType);
+        Type second_type = pop_type(compiler);
+        if (second_type != TY_INTEGER) {
+		type_error(TY_INTEGER, second_type);
         }
-        pushType(compiler, TY_INTEGER);
+        push_type(compiler, TY_INTEGER);
 
-        writeIntoChunk(compiler->chunk, OP_SUB);
+        write_into_chunk(compiler->chunk, OP_SUB);
 }
 
-static void compileMultiplicationOrDivision(Compiler *compiler) {
-	compileUnary(compiler);
+static void compile_multiplication_and_division(Compiler *compiler) {
+	compile_unary(compiler);
 	for (;;) {
-		Token token = peekNextToken(compiler->lexer);
+		Token token = peek_next_token(compiler->lexer);
 		switch (token.type) {
 			case TT_STAR:
-				compileMultiplication(compiler);
+				compile_multiplication(compiler);
 				break;
 			case TT_SLASH:
-				compileDivision(compiler);
+				compile_division(compiler);
 				break;
 			default:
 				return;
@@ -269,128 +269,128 @@ static void compileMultiplicationOrDivision(Compiler *compiler) {
 	}
 }
 
-static void compileMultiplication(Compiler *compiler) {
-        getNextToken(compiler->lexer);
-        compileUnary(compiler);
+static void compile_multiplication(Compiler *compiler) {
+        get_next_token(compiler->lexer);
+        compile_unary(compiler);
 
-        Type firstType = popType(compiler);
-        if (firstType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type first_type = pop_type(compiler);
+        if (first_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        Type secondType = popType(compiler);
-        if (secondType != TY_INTEGER) {
-		typeError(TY_INTEGER, secondType);
+        Type second_type = pop_type(compiler);
+        if (second_type != TY_INTEGER) {
+		type_error(TY_INTEGER, second_type);
         }
-        pushType(compiler, TY_INTEGER);
+        push_type(compiler, TY_INTEGER);
 
-        writeIntoChunk(compiler->chunk, OP_MUL);
+        write_into_chunk(compiler->chunk, OP_MUL);
 }
 
-static void compileDivision(Compiler *compiler) {
-        getNextToken(compiler->lexer);
-        compileUnary(compiler);
+static void compile_division(Compiler *compiler) {
+        get_next_token(compiler->lexer);
+        compile_unary(compiler);
 
-        Type firstType = popType(compiler);
-        if (firstType != TY_INTEGER) {
-		typeError(TY_INTEGER, firstType);
+        Type first_type = pop_type(compiler);
+        if (first_type != TY_INTEGER) {
+		type_error(TY_INTEGER, first_type);
         }
-        Type secondType = popType(compiler);
-        if (secondType != TY_INTEGER) {
-		typeError(TY_INTEGER, secondType);
+        Type second_type = pop_type(compiler);
+        if (second_type != TY_INTEGER) {
+		type_error(TY_INTEGER, second_type);
         }
-        pushType(compiler, TY_INTEGER);
+        push_type(compiler, TY_INTEGER);
 
-        writeIntoChunk(compiler->chunk, OP_DIV);
+        write_into_chunk(compiler->chunk, OP_DIV);
 }
 
-static void compileUnary(Compiler *compiler) {
+static void compile_unary(Compiler *compiler) {
 	Chunk *chunk = compiler->chunk;
-	Token token = peekNextToken(compiler->lexer);
+	Token token = peek_next_token(compiler->lexer);
 	switch (token.type) {
 		case TT_NUMBER: {
-			getNextToken(compiler->lexer);
-			writeIntoChunk(chunk, OP_PUSH_INTEGER);
+			get_next_token(compiler->lexer);
+			write_into_chunk(chunk, OP_PUSH_INTEGER);
 			int n = atoi(token.start);
-			writeIntoChunk(chunk, n);
-			pushType(compiler, TY_INTEGER);
+			write_into_chunk(chunk, n);
+			push_type(compiler, TY_INTEGER);
 			break;
 		}
 		case TT_TRUE: {
-			getNextToken(compiler->lexer);
-			writeIntoChunk(chunk, OP_PUSH_TRUE);
-			pushType(compiler, TY_BOOLEAN);
+			get_next_token(compiler->lexer);
+			write_into_chunk(chunk, OP_PUSH_TRUE);
+			push_type(compiler, TY_BOOLEAN);
 			break;
 		}
 		case TT_FALSE: {
-			getNextToken(compiler->lexer);
-			writeIntoChunk(chunk, OP_PUSH_FALSE);
-			pushType(compiler, TY_BOOLEAN);
+			get_next_token(compiler->lexer);
+			write_into_chunk(chunk, OP_PUSH_FALSE);
+			push_type(compiler, TY_BOOLEAN);
 			break;
 		}
 		case TT_LPAREN: {
-			getNextToken(compiler->lexer);
-			compileExpression(compiler);
+			get_next_token(compiler->lexer);
+			compile_expression(compiler);
 			match(compiler, TT_RPAREN);
 			break;
 		}
 		case TT_MINUS: {
-			compileNegation(compiler);
+			compile_negation(compiler);
 			break;
 		}
 		case TT_NAME: {
-                        compileName(compiler);
+                        compile_name(compiler);
 			break;
 		}
 		default: {
 			fprintf(stderr, "Syntax Error: Unexpected token ");
-			printToken(stderr, &token);
+			print_token(stderr, &token);
 			fprintf(stderr, " while parsing expression\n");
                         exit(EXIT_FAILURE);
 		}
 	}
 }
 
-static void compileName(Compiler *compiler) {
-        Token token = getNextToken(compiler->lexer);
-        writeIntoChunk(compiler->chunk, OP_LOAD);
+static void compile_name(Compiler *compiler) {
+        Token token = get_next_token(compiler->lexer);
+        write_into_chunk(compiler->chunk, OP_LOAD);
 
-        int i = resolveVariable(compiler, &token);
-        writeIntoChunk(compiler->chunk, i);
+        int i = resolve_variable(compiler, &token);
+        write_into_chunk(compiler->chunk, i);
 }
         
 
-static void compileNegation(Compiler *compiler) {
-	getNextToken(compiler->lexer);
-	compileUnary(compiler);
+static void compile_negation(Compiler *compiler) {
+	get_next_token(compiler->lexer);
+	compile_division(compiler);
 
-        Type type = popType(compiler);
+        Type type = pop_type(compiler);
         if (type != TY_INTEGER) {
-		typeError(TY_INTEGER, type);
+		type_error(TY_INTEGER, type);
         }
-        pushType(compiler, TY_INTEGER);
+        push_type(compiler, TY_INTEGER);
 
-	writeIntoChunk(compiler->chunk, OP_NEGATE);
+	write_into_chunk(compiler->chunk, OP_NEGATE);
 }
 
 static Token match(Compiler *compiler, TokenType type) {
-	Token token = peekNextToken(compiler->lexer);
+	Token token = peek_next_token(compiler->lexer);
 	if (token.type != type) {
 		fprintf(stderr, "Syntax Error: Expected ");
-		printTokenType(stderr, &type);
+		print_token_type(stderr, &type);
 		fprintf(stderr, " but found ");
-		printToken(stderr, &token);
+		print_token(stderr, &token);
 		fprintf(stderr, "\n");
                 exit(EXIT_FAILURE);
 	}
-	return getNextToken(compiler->lexer);
+	return get_next_token(compiler->lexer);
 }
 
-static int resolveVariable(Compiler *compiler, Token *name) {
-	for (int i = compiler->variableCount - 1; i >= 0; --i) {
+static int resolve_variable(Compiler *compiler, Token *name) {
+	for (int i = compiler->variable_count - 1; i >= 0; --i) {
 		Variable *variable = &compiler->variables[i];
-		if (tokenEqual(&variable->name, name)) {
+		if (token_equal(&variable->name, name)) {
 			if (variable->depth != -1) {
-                            pushType(compiler, variable->type);
+                            push_type(compiler, variable->type);
                             return i;
 			}
 		}
@@ -400,44 +400,44 @@ static int resolveVariable(Compiler *compiler, Token *name) {
         exit(EXIT_FAILURE);
 }
 
-static void enterBlock(Compiler *compiler) {
+static void enter_block(Compiler *compiler) {
 	compiler->depth++;
 }
 
-static void exitBlock(Compiler *compiler) {
+static void exit_block(Compiler *compiler) {
 	compiler->depth--;
 
-	while (compiler->variableCount > 0 &&
-			compiler->variables[compiler->variableCount - 1].depth > compiler->depth) {
-		writeIntoChunk(compiler->chunk, OP_POP);
-		compiler->variableCount--;
+	while (compiler->variable_count > 0 &&
+			compiler->variables[compiler->variable_count - 1].depth > compiler->depth) {
+		write_into_chunk(compiler->chunk, OP_POP);
+		compiler->variable_count--;
 	}
 }
 
-static void declareVariable(Compiler *compiler, Token name, Type type) {
-	Variable* variable = &compiler->variables[compiler->variableCount++];
+static void declare_variable(Compiler *compiler, Token name, Type type) {
+	Variable* variable = &compiler->variables[compiler->variable_count++];
 	variable->name = name;
         variable->type = type;
 	variable->depth = -1;
 }
 
-static void markInitialized(Compiler *compiler) {
-	compiler->variables[compiler->variableCount - 1].depth = compiler->depth;
+static void mark_initializied(Compiler *compiler) {
+	compiler->variables[compiler->variable_count - 1].depth = compiler->depth;
 }
 
-static void pushType(Compiler *compiler, Type type) {
-        compiler->typeStack[compiler->typeStackSize++] = type;
+static void push_type(Compiler *compiler, Type type) {
+        compiler->type_stack[compiler->type_stackSize++] = type;
 }
 
-static Type popType(Compiler *compiler) {
-        return compiler->typeStack[--compiler->typeStackSize];
+static Type pop_type(Compiler *compiler) {
+        return compiler->type_stack[--compiler->type_stackSize];
 }
 
-static void typeError(Type expected, Type found) {
+static void type_error(Type expected, Type found) {
 	fprintf(stderr, "TypeError: Expected ");
-	printType(stderr, expected);
+	print_type(stderr, expected);
 	fprintf(stderr, " but found ");
-	printType(stderr, found);
+	print_type(stderr, found);
 	fprintf(stderr, "\n");
         exit(EXIT_FAILURE);
 }

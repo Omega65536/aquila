@@ -17,8 +17,8 @@ typedef struct Interpreter {
         int capacity;
 } Interpreter;
 
-void initInterpreter(Interpreter *interpreter, Chunk *chunk);
-void freeInterpreter(Interpreter *interpreter);
+void init_interpreter(Interpreter *interpreter, Chunk *chunk);
+void free_interpreter(Interpreter *interpreter);
 
 int interpret(Interpreter *interpreter);
 

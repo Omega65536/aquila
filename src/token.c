@@ -3,15 +3,15 @@
 #include <string.h>
 #include <stdbool.h>
 
-bool tokenEqual(Token *a, Token *b) {
+bool token_equal(Token *a, Token *b) {
 	if (a->length != b->length) {
 		return false;
 	}
 	return strncmp(a->start, b->start, a->length) == 0;
 }
 
-void printTokenType(FILE *file, TokenType *tokenType) {
-	switch (*tokenType) {
+void print_token_type(FILE *file, TokenType *token_type) {
+	switch (*token_type) {
                 // Special
 		case TT_END:
 			fprintf(file, "End");
@@ -106,7 +106,7 @@ void printTokenType(FILE *file, TokenType *tokenType) {
 	}
 }
 
-void printToken(FILE *file, Token *token) {
+void print_token(FILE *file, Token *token) {
 	switch (token->type) {
 		case TT_END:
 			fprintf(file, "END");

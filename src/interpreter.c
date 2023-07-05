@@ -9,10 +9,10 @@
 static uint32_t next(Interpreter *interpreter);
 static void push(Interpreter *interpreter, Object value);
 static Object pop(Interpreter *interpreter);
-static Object makeInteger(int value);
-static Object makeBoolean(bool value);
+static Object make_integer(int value);
+static Object make_boolean(bool value);
 
-void initInterpreter(Interpreter *interpreter, Chunk *chunk) {
+void init_interpreter(Interpreter *interpreter, Chunk *chunk) {
         interpreter->chunk = chunk;
 	interpreter->index = 0;
         interpreter->stack = malloc(4 * sizeof(Object));
@@ -20,30 +20,30 @@ void initInterpreter(Interpreter *interpreter, Chunk *chunk) {
         interpreter->capacity = 4;
 }
 
-void freeInterpreter(Interpreter *interpreter) {
+void free_interpreter(Interpreter *interpreter) {
         free(interpreter->stack);
 }
 
 int interpret(Interpreter *interpreter) {
 	for (;;) {
-		OpCode opCode = next(interpreter);
-		//printf("%d: %d\n", i, opCode);
-                switch (opCode) {
+		OpCode op_code = next(interpreter);
+		//printf("%d: %d\n", i, op_code);
+                switch (op_code) {
                         case OP_NOOP:
                                 break;
 			case OP_EXIT:
 				return 0;
                         case OP_PUSH_INTEGER: {
                                 int value = next(interpreter);
-                                push(interpreter, makeInteger(value));
+                                push(interpreter, make_integer(value));
                                 break;
                         }
                         case OP_PUSH_TRUE: {
-                                push(interpreter, makeBoolean(true));
+                                push(interpreter, make_boolean(true));
                                 break;
                         }
                         case OP_PUSH_FALSE: {
-                                push(interpreter, makeBoolean(false));
+                                push(interpreter, make_boolean(false));
                                 break;
                         }
 			case OP_POP: {
@@ -73,38 +73,38 @@ int interpret(Interpreter *interpreter) {
                                 int a = pop(interpreter).integer;
                                 int b = pop(interpreter).integer;
                                 int result = b + a;
-                                push(interpreter, makeInteger(result));
+                                push(interpreter, make_integer(result));
                                 break;
                         }
                         case OP_SUB: {
                                 int a = pop(interpreter).integer;
                                 int b = pop(interpreter).integer;
                                 int result = b - a;
-                                push(interpreter, makeInteger(result));
+                                push(interpreter, make_integer(result));
                                 break;
                         }
                         case OP_MUL: {
                                 int a = pop(interpreter).integer;
                                 int b = pop(interpreter).integer;
                                 int result = b * a;
-                                push(interpreter, makeInteger(result));
+                                push(interpreter, make_integer(result));
                                 break;
                         }
                         case OP_DIV: {
                                 int a = pop(interpreter).integer;
                                 int b = pop(interpreter).integer;
                                 int result = b / a;
-                                push(interpreter, makeInteger(result));
+                                push(interpreter, make_integer(result));
                                 break;
                         }
                         case OP_NEGATE: {
                                 int a = pop(interpreter).integer;
                                 int result = -a;
-                                push(interpreter, makeInteger(result));
+                                push(interpreter, make_integer(result));
                                 break;
                         }
                         default:
-                                fprintf(stderr, "Invalid opcode: %d\n", opCode);
+                                fprintf(stderr, "Invalid opcode: %d\n", op_code);
                                 exit(EXIT_FAILURE);
                                 break;
                 }
@@ -127,8 +127,8 @@ static uint32_t next(Interpreter *interpreter) {
 static void push(Interpreter *interpreter, Object value) {
         if (interpreter->length == interpreter->capacity) {
                 interpreter->capacity *= 2;
-                int newSize = interpreter->capacity * sizeof(Object);
-                interpreter->stack = realloc(interpreter->stack, newSize);
+                int new_size = interpreter->capacity * sizeof(Object);
+                interpreter->stack = realloc(interpreter->stack, new_size);
         }
         interpreter->stack[interpreter->length] = value;
         interpreter->length++;
@@ -138,13 +138,13 @@ static Object pop(Interpreter *interpreter) {
         return interpreter->stack[--interpreter->length];
 }
 
-static Object makeInteger(int value) {
+static Object make_integer(int value) {
     Object object;
     object.integer = value;
     return object;
 }
 
-static Object makeBoolean(bool value) {
+static Object make_boolean(bool value) {
     Object object;
     object.boolean = value;
     return object;
