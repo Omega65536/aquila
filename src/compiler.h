@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef COMPILER_H
+#define COMPILER_H
 
 #include "token.h"
 #include "chunk.h"
@@ -14,7 +14,7 @@ typedef struct Variable {
 } Variable;
 
 
-typedef struct Parser {
+typedef struct Compiler {
 	Lexer *lexer;
 	Chunk *chunk;
 
@@ -24,9 +24,9 @@ typedef struct Parser {
 
 	Type typeStack[256];
 	int typeStackSize;
-} Parser;
+} Compiler;
 
-void initParser(Parser *parser, Lexer *lexer, Chunk *chunk);
-void parse(Parser *parser);
+void initCompiler(Compiler *compiler, Lexer *lexer, Chunk *chunk);
+void compile(Compiler *compile);
 
 #endif

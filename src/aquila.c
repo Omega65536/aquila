@@ -3,7 +3,7 @@
 
 #include "lexer.h"
 #include "chunk.h"
-#include "parser.h"
+#include "compiler.h"
 #include "interpreter.h"
 
 char *readSource(char *path) {
@@ -33,11 +33,11 @@ void run(char *source) {
 	Chunk chunk;
 	initChunk(&chunk);
 
-	Parser parser;
-	initParser(&parser, &lexer, &chunk);
+	Compiler compiler;
+	initCompiler(&compiler, &lexer, &chunk);
 
         printf("=== PARSING ===\n");
-	parse(&parser);
+	compile(&compiler);
 
         printChunk(&chunk);
 
