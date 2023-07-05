@@ -36,15 +36,13 @@ void run(char *source) {
 	Compiler compiler;
 	init_compiler(&compiler, &lexer, &chunk);
 
-        printf("=== PARSING ===\n");
 	compile(&compiler);
 
-        print_chunk(&chunk);
+        //print_chunk(&chunk);
 
         Interpreter interpreter;
         init_interpreter(&interpreter, &chunk);
 
-        printf("=== COMPILING ===\n");
         interpret(&interpreter);
 
 	free_chunk(&chunk);

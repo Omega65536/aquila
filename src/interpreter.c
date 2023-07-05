@@ -62,10 +62,10 @@ int interpret(Interpreter *interpreter) {
 			}
 			case OP_PRINT_BOOLEAN: {
 				bool value = pop(interpreter).boolean;
-                                if (value == 0) {
-                                        printf("false\n");
-                                } else {
+                                if (value ) {
                                         printf("true\n");
+                                } else {
+                                        printf("false\n");
                                 }
 				break;
 			}
@@ -101,6 +101,48 @@ int interpret(Interpreter *interpreter) {
                                 int a = pop(interpreter).integer;
                                 int result = -a;
                                 push(interpreter, make_integer(result));
+                                break;
+                        }
+                        case OP_EQUAL: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b == a;
+                                push(interpreter, make_boolean(result));
+                                break;
+                        }
+                        case OP_NOT_EQUAL: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b != a;
+                                push(interpreter, make_boolean(result));
+                                break;
+                        }
+                        case OP_LESS: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b < a;
+                                push(interpreter, make_boolean(result));
+                                break;
+                        }
+                        case OP_LESS_EQUAL: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b <= a;
+                                push(interpreter, make_boolean(result));
+                                break;
+                        }
+                        case OP_GREATER: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b > a;
+                                push(interpreter, make_boolean(result));
+                                break;
+                        }
+                        case OP_GREATER_EQUAL: {
+                                int a = pop(interpreter).integer;
+                                int b = pop(interpreter).integer;
+                                bool result = b >= a;
+                                push(interpreter, make_boolean(result));
                                 break;
                         }
                         default:
