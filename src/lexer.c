@@ -27,6 +27,7 @@ Token make_token(Lexer *lexer, TokenType type) {
 	token.type = type;
 	token.start = lexer->start;
 	token.length = (int) (lexer->current - lexer->start);
+
 	return token;
 }
 
@@ -58,7 +59,7 @@ Token advance_lexer(Lexer *lexer) {
 			break;
 		}
 
-		lexer->current++;
+                next_char(lexer);
 	}
 
 	lexer->start = lexer->current;
@@ -115,15 +116,15 @@ Token advance_lexer(Lexer *lexer) {
 
 	if (isdigit(ch)) {
 		while (isdigit(*lexer->current)) {
-			lexer->current++;
-		}
+                    next_char(lexer);
+                }
 		return make_token(lexer, TT_NUMBER);
 	}
 
 	if (isalpha(ch)) {
 		while (isalpha(*lexer->current)) {
-			lexer->current++;
-		}
+                    next_char(lexer);
+                }
 
 		char *name = lexer->start;
 		if (strncmp(name, KW_LET, strlen(KW_LET)) == 0) {
@@ -147,7 +148,5 @@ Token advance_lexer(Lexer *lexer) {
 }
 
 static char next_char(Lexer *lexer) {
-	char ch = *lexer->current;
-	lexer->current++;
-        return ch;
+	return *lexer->current++;
 }

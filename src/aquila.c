@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "lexer.h"
 #include "chunk.h"
@@ -26,7 +28,7 @@ char *read_source(char *path) {
 	return source;
 }
 
-void run(char *source) {
+void run(char *source, bool only_compile) {
 	Lexer lexer;
 	init_lexer(&lexer, source);
 
@@ -38,7 +40,11 @@ void run(char *source) {
 
 	compile(&compiler);
 
-        //print_chunk(&chunk);
+        if (only_compile) {
+            print_chunk(&chunk);
+            free_chunk(&chunk);
+            return;
+        }
 
         Interpreter interpreter;
         init_interpreter(&interpreter, &chunk);
@@ -49,17 +55,20 @@ void run(char *source) {
 	free_interpreter(&interpreter);
 }
 
-void test(char *path) {
-	char *source = read_source(path);
-	run(source);
-	free(source);
-
-}
-
 int main(int argc, char *argv[]) {
-	if (argc != 2) {
+	if (argc < 2) {
 		fprintf(stderr, "usage: aquila <path>\n");
 		exit(EXIT_FAILURE);
 	}
-	test(argv[1]);
+
+        bool only_compile = false;
+        for (int i = 2; i < argc; i++) {
+            if (strcmp(argv[i], "-C") == 0) {
+                only_compile = true;
+            }
+        }
+
+	char *source = read_source(argv[1]);
+	run(source, only_compile);
+	free(source);
 }

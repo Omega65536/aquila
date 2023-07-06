@@ -1,5 +1,5 @@
 {
-    let x: integer = 2;
+    let x: integer = 6;
     let y: integer = 3;
-    print(x * y);
+    print(x / y);
 }
