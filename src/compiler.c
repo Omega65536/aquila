@@ -14,6 +14,7 @@ static void compile_statement(Compiler *compiler);
 static void compile_block(Compiler *compiler);
 static void compile_let(Compiler *compiler);
 static Type compile_type(Compiler *compiler);
+static void compile_if(Compiler *compiler);
 static void compile_print(Compiler *compiler);
 
 static void compile_expression(Compiler *compiler);
@@ -70,6 +71,9 @@ static void compile_statement(Compiler *compiler) {
 		case TT_PRINT:
 			compile_print(compiler);
 			break;
+                case TT_IF:
+                        compile_if(compiler);
+                        break;
 		default:
 			fprintf(stderr, "Syntax Error: Unexpected token ");
 			print_token(stderr, &token);
@@ -154,6 +158,17 @@ static void compile_print(Compiler *compiler) {
                 write_into_chunk(compiler->chunk, OP_PRINT_BOOLEAN);
                 break;
         }
+}
+
+static void compile_if(Compiler *compiler) {
+    match(compiler, TT_IF);
+    compile_expression(compiler);
+    match_type(compiler, TY_BOOLEAN);
+    write_into_chunk(compiler->chunk, OP_JUMP_IF_FALSE);
+    int dest_index = compiler->chunk->length;
+    write_into_chunk(compiler->chunk, -1);
+    compile_block(compiler);
+    compiler->chunk->code[dest_index] = compiler->chunk->length;
 }
 
 static void compile_expression(Compiler *compiler) {

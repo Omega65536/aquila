@@ -87,6 +87,9 @@ void print_chunk(Chunk *chunk) {
 			case OP_GREATER_EQUAL:
 				printf("GREATER_EQUAL");
 				break;
+                        case OP_JUMP_IF_FALSE:
+                                printf("JUMP_IF_FALSE %d", chunk->code[++i]);
+                                break;
 			default:
 				printf("UNKNOWN OP: %d", chunk->code[i]);
 				break;

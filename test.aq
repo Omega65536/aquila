@@ -1,5 +1,10 @@
 {
-    let x: integer = 6;
-    let y: integer = 3;
-    print(x / y);
+    if true {
+        let a: integer = 1;
+        print(a);
+        if true {
+            print(a);
+        }
+        print(a);
+    }
 }

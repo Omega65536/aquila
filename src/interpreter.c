@@ -145,6 +145,14 @@ int interpret(Interpreter *interpreter) {
                                 push(interpreter, make_boolean(result));
                                 break;
                         }
+                        case OP_JUMP_IF_FALSE: {
+                                bool cond = pop(interpreter).boolean;
+                                int dest = next(interpreter);
+                                if (!cond) {
+                                    interpreter->index = dest;
+                                }
+                                break;
+                        }
                         default:
                                 fprintf(stderr, "Invalid opcode: %d\n", op_code);
                                 exit(EXIT_FAILURE);
@@ -163,7 +171,7 @@ int interpret(Interpreter *interpreter) {
 }
 
 static uint32_t next(Interpreter *interpreter) {
-		return interpreter->chunk->code[interpreter->index++];
+        return interpreter->chunk->code[interpreter->index++];
 }
 
 static void push(Interpreter *interpreter, Object value) {

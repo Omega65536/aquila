@@ -12,6 +12,7 @@ typedef enum TokenType {
         // Keywords
 	TT_LET,
 	TT_PRINT,
+        TT_IF,
 	TT_TRUE,
 	TT_FALSE,
         TT_INTEGER,

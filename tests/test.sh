@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname $0)
 
-arr=("test_print" "test_math" "test_variables" "test_comparison")
+arr=("test_print" "test_math" "test_variables" "test_comparison" "test_if")
 
 for name in "${arr[@]}"
 do
