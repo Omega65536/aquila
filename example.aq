@@ -1,0 +1,6 @@
+{
+    let a: boolean = false;
+    print(a);
+    a = true;
+    print(a);
+}
