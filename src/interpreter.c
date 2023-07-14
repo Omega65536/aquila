@@ -159,6 +159,11 @@ int interpret(Interpreter *interpreter) {
                                 }
                                 break;
                         }
+                        case OP_JUMP: {
+                                int dest = next(interpreter);
+                                interpreter->index = dest;
+                                break;
+                        }
                         default:
                                 fprintf(stderr, "Invalid opcode: %d\n", op_code);
                                 exit(EXIT_FAILURE);

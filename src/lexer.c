@@ -8,6 +8,7 @@
 static const char *KW_LET = "let";
 static const char *KW_PRINT = "print";
 static const char *KW_IF = "if";
+static const char *KW_WHILE = "while";
 static const char *KW_TRUE = "true";
 static const char *KW_FALSE = "false";
 static const char *KW_INTEGER = "integer";
@@ -134,6 +135,8 @@ Token advance_lexer(Lexer *lexer) {
 			return make_token(lexer, TT_PRINT);
 		} else if (strncmp(name, KW_IF, strlen(KW_IF)) == 0) {
 			return make_token(lexer, TT_IF);
+		} else if (strncmp(name, KW_WHILE, strlen(KW_WHILE)) == 0) {
+			return make_token(lexer, TT_WHILE);
 		} else if (strncmp(name, KW_TRUE, strlen(KW_TRUE)) == 0) {
 			return make_token(lexer, TT_TRUE);
 		} else if (strncmp(name, KW_FALSE, strlen(KW_FALSE)) == 0) {

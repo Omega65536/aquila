@@ -16,6 +16,7 @@ static void compile_let(Compiler *compiler);
 static void compile_assignment(Compiler *compiler);
 static Type compile_type(Compiler *compiler);
 static void compile_if(Compiler *compiler);
+static void compile_while(Compiler *compiler);
 static void compile_print(Compiler *compiler);
 
 static void compile_expression(Compiler *compiler);
@@ -75,6 +76,9 @@ static void compile_statement(Compiler *compiler) {
                 case TT_IF:
                         compile_if(compiler);
                         break;
+                case TT_WHILE:
+                        compile_while(compiler);
+                        break;
 		default:
                         compile_assignment(compiler);
 	}
@@ -119,9 +123,9 @@ static void compile_let(Compiler *compiler) {
 	compile_expression(compiler);
 	match(compiler, TT_SEMICOLON);
 
-        Type expressionType = pop_type(compiler);
-        if (expressionType != type) {
-            type_error(type, expressionType);
+        Type expression_type = pop_type(compiler);
+        if (expression_type != type) {
+            type_error(type, expression_type);
         }
 
 	mark_initializied(compiler);
@@ -178,6 +182,20 @@ static void compile_if(Compiler *compiler) {
     int dest_index = compiler->chunk->length;
     write_into_chunk(compiler->chunk, -1);
     compile_block(compiler);
+    compiler->chunk->code[dest_index] = compiler->chunk->length;
+}
+
+static void compile_while(Compiler *compiler) {
+    match(compiler, TT_WHILE);
+    int entry_index = compiler->chunk->length;
+    compile_expression(compiler);
+    match_type(compiler, TY_BOOLEAN);
+    write_into_chunk(compiler->chunk, OP_JUMP_IF_FALSE);
+    int dest_index = compiler->chunk->length;
+    write_into_chunk(compiler->chunk, -1);
+    compile_block(compiler);
+    write_into_chunk(compiler->chunk, OP_JUMP);
+    write_into_chunk(compiler->chunk, entry_index);
     compiler->chunk->code[dest_index] = compiler->chunk->length;
 }
 

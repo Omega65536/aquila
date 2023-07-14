@@ -27,6 +27,9 @@ void print_token_type(FILE *file, TokenType *token_type) {
 		case TT_IF:
 			fprintf(file, "'if'");
 			break;
+		case TT_WHILE:
+			fprintf(file, "'while'");
+			break;
 		case TT_TRUE:
 			fprintf(file, "'true'");
 			break;

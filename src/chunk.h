@@ -30,6 +30,7 @@ typedef enum OpCode {
         OP_GREATER,
         OP_GREATER_EQUAL,
 
+        OP_JUMP,
         OP_JUMP_IF_FALSE,
 } OpCode;
 
