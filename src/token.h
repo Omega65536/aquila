@@ -13,6 +13,7 @@ typedef enum TokenType {
 	TT_LET,
 	TT_PRINT,
         TT_IF,
+        TT_WHILE,
 	TT_TRUE,
 	TT_FALSE,
         TT_INTEGER,
