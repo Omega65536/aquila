@@ -48,6 +48,9 @@ void print_chunk(Chunk *chunk) {
 			case OP_LOAD:
 				printf("LOAD %d", chunk->code[++i]);
 				break;
+			case OP_STORE:
+				printf("STORE %d", chunk->code[++i]);
+				break;
 			case OP_PRINT_INTEGER:
 				printf("PRINT_INTEGER");
 				break;

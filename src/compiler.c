@@ -13,6 +13,7 @@
 static void compile_statement(Compiler *compiler);
 static void compile_block(Compiler *compiler);
 static void compile_let(Compiler *compiler);
+static void compile_assignment(Compiler *compiler);
 static Type compile_type(Compiler *compiler);
 static void compile_if(Compiler *compiler);
 static void compile_print(Compiler *compiler);
@@ -75,10 +76,7 @@ static void compile_statement(Compiler *compiler) {
                         compile_if(compiler);
                         break;
 		default:
-			fprintf(stderr, "Syntax Error: Unexpected token ");
-			print_token(stderr, &token);
-			fprintf(stderr, " while parsing statement\n");
-                        exit(EXIT_FAILURE);
+                        compile_assignment(compiler);
 	}
 }
 
@@ -127,6 +125,18 @@ static void compile_let(Compiler *compiler) {
         }
 
 	mark_initializied(compiler);
+}
+
+static void compile_assignment(Compiler *compiler) {
+        Token name = match(compiler, TT_NAME);
+        match(compiler, TT_EQUAL);
+        compile_expression(compiler);
+	match(compiler, TT_SEMICOLON);
+
+        int i = resolve_variable(compiler, &name);
+        match_type(compiler, pop_type(compiler));
+        write_into_chunk(compiler->chunk, OP_STORE);
+        write_into_chunk(compiler->chunk, i);
 }
 
 static Type compile_type(Compiler *compiler) {

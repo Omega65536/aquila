@@ -12,6 +12,7 @@ typedef enum OpCode {
 	OP_PUSH_TRUE,
 	OP_PUSH_FALSE,
 	OP_LOAD,
+        OP_STORE,
 
 	OP_PRINT_INTEGER,
 	OP_PRINT_BOOLEAN,

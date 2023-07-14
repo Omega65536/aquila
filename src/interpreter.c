@@ -55,6 +55,12 @@ int interpret(Interpreter *interpreter) {
 				push(interpreter, interpreter->stack[index]);
 				break;
 			}
+                        case OP_STORE: {
+                                 int index = next(interpreter);
+                                 Object object = pop(interpreter);
+                                 interpreter->stack[index] = object;
+                                 break;
+                        }
 			case OP_PRINT_INTEGER: {
 				int value = pop(interpreter).integer;
 				printf("%d\n", value);
