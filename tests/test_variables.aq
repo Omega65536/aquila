@@ -1,4 +1,4 @@
-{
+func main() {
     let a: integer = 1000;
     let b: boolean = true;
 

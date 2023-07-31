@@ -1,4 +1,4 @@
-{
+func main() {
     let x: integer = 0;
     while x < 3 {
         let y: integer = 0;
