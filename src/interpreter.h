@@ -5,16 +5,16 @@
 #include <stdbool.h>
 
 typedef union Object {
-        int integer;
-        bool boolean;
+	int integer;
+	bool boolean;
 } Object;
 
 typedef struct Interpreter {
-        Chunk *chunk;
+	Chunk *chunk;
 	int index;
-        Object *stack;
-        int length;
-        int capacity;
+	Object *stack;
+	int length;
+	int capacity;
 } Interpreter;
 
 void init_interpreter(Interpreter *interpreter, Chunk *chunk);

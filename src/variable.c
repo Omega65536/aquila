@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "variable.h"
+#include <stdlib.h>
 
 void init_variable_stack(VariableStack *vs) {
 	vs->variables = malloc(256 * sizeof(Variable));
@@ -16,13 +16,13 @@ int resolve_variable(VariableStack *vs, Token *name) {
 		Variable *variable = &vs->variables[i];
 		if (token_equal(&variable->name, name)) {
 			if (variable->depth != -1) {
-                            return i;
+				return i;
 			}
 		}
 	}
 
 	fprintf(stderr, "Undeclared variable!\n");
-        exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
 }
 
 void enter_block(VariableStack *vs) {
@@ -34,7 +34,7 @@ int exit_block(VariableStack *vs) {
 
 	int pops = 0;
 	while (vs->variable_count > 0 &&
-			vs->variables[vs->variable_count - 1].depth > vs->depth) {
+	       vs->variables[vs->variable_count - 1].depth > vs->depth) {
 		pops++;
 		vs->variable_count--;
 	}
@@ -50,13 +50,13 @@ void declare_variable(VariableStack *vs, Token name, Type type) {
 
 		if (token_equal(&name, &variable->name)) {
 			fprintf(stderr, "Variable already declared\n");
-                        exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);
 		}
 	}
 
-	Variable* variable = &vs->variables[vs->variable_count++];
+	Variable *variable = &vs->variables[vs->variable_count++];
 	variable->name = name;
-        variable->type = type;
+	variable->type = type;
 	variable->depth = -1;
 }
 

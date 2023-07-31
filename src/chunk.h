@@ -12,7 +12,7 @@ typedef enum OpCode {
 	OP_PUSH_TRUE,
 	OP_PUSH_FALSE,
 	OP_LOAD,
-        OP_STORE,
+	OP_STORE,
 
 	OP_PRINT_INTEGER,
 	OP_PRINT_BOOLEAN,
@@ -23,15 +23,15 @@ typedef enum OpCode {
 	OP_DIV,
 	OP_NEGATE,
 
-        OP_EQUAL,
-        OP_NOT_EQUAL,
-        OP_LESS,
-        OP_LESS_EQUAL,
-        OP_GREATER,
-        OP_GREATER_EQUAL,
+	OP_EQUAL,
+	OP_NOT_EQUAL,
+	OP_LESS,
+	OP_LESS_EQUAL,
+	OP_GREATER,
+	OP_GREATER_EQUAL,
 
-        OP_JUMP,
-        OP_JUMP_IF_FALSE,
+	OP_JUMP,
+	OP_JUMP_IF_FALSE,
 } OpCode;
 
 typedef struct Chunk {

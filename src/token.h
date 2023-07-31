@@ -1,48 +1,48 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 typedef enum TokenType {
-        // Special
+	// Special
 	TT_END,
 	TT_UNKNOWN,
 
-        // Keywords
-        TT_FUNC,
+	// Keywords
+	TT_FUNC,
 	TT_LET,
 	TT_PRINT,
-        TT_IF,
-        TT_WHILE,
+	TT_IF,
+	TT_WHILE,
 	TT_TRUE,
 	TT_FALSE,
-        TT_INTEGER,
-        TT_BOOLEAN,
+	TT_INTEGER,
+	TT_BOOLEAN,
 
-        // Delimiter
+	// Delimiter
 	TT_SEMICOLON,
-        TT_COLON,
+	TT_COLON,
 	TT_LPAREN,
 	TT_RPAREN,
 	TT_LCURLY,
 	TT_RCURLY,
 
-        // Operator
+	// Operator
 	TT_EQUAL,
 	TT_PLUS,
 	TT_MINUS,
 	TT_STAR,
 	TT_SLASH,
 
-        TT_DOUBLE_EQUAL,
-        TT_NOT_EQUAL,
-        TT_LESS,
-        TT_LESS_EQUAL,
-        TT_GREATER,
-        TT_GREATER_EQUAL,
+	TT_DOUBLE_EQUAL,
+	TT_NOT_EQUAL,
+	TT_LESS,
+	TT_LESS_EQUAL,
+	TT_GREATER,
+	TT_GREATER_EQUAL,
 
-        // Other
+	// Other
 	TT_NUMBER,
 	TT_NAME,
 } TokenType;
@@ -53,7 +53,7 @@ typedef struct Token {
 	int length;
 } Token;
 
-bool token_equal(Token* a, Token *b);
+bool token_equal(Token *a, Token *b);
 void print_token_type(FILE *file, TokenType *token_type);
 void print_token(FILE *file, Token *token);
 

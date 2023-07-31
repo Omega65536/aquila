@@ -62,16 +62,16 @@ Token advance_lexer(Lexer *lexer) {
 			break;
 		}
 
-                next_char(lexer);
+		next_char(lexer);
 	}
 
 	lexer->start = lexer->current;
-        char ch = next_char(lexer);
+	char ch = next_char(lexer);
 
 	switch (ch) {
 		case ';':
 			return make_token(lexer, TT_SEMICOLON);
-                case ':':
+		case ':':
 			return make_token(lexer, TT_COLON);
 		case '(':
 			return make_token(lexer, TT_LPAREN);
@@ -82,10 +82,10 @@ Token advance_lexer(Lexer *lexer) {
 		case '}':
 			return make_token(lexer, TT_RCURLY);
 		case '=':
-                        if (*lexer->current == '=') {
-                            next_char(lexer);
-                            return make_token(lexer, TT_DOUBLE_EQUAL);
-                        }
+			if (*lexer->current == '=') {
+				next_char(lexer);
+				return make_token(lexer, TT_DOUBLE_EQUAL);
+			}
 			return make_token(lexer, TT_EQUAL);
 		case '+':
 			return make_token(lexer, TT_PLUS);
@@ -95,39 +95,39 @@ Token advance_lexer(Lexer *lexer) {
 			return make_token(lexer, TT_STAR);
 		case '/':
 			return make_token(lexer, TT_SLASH);
-                case '!':
-                        if (*lexer->current == '=') {
-                            next_char(lexer);
-                            return make_token(lexer, TT_NOT_EQUAL);
-                        }
-                        break;
-                case '<':
-                        if (*lexer->current == '=') {
-                            next_char(lexer);
-                            return make_token(lexer, TT_LESS_EQUAL);
-                        }
-                        return make_token(lexer, TT_LESS);
-                case '>':
-                        if (*lexer->current == '=') {
-                            next_char(lexer);
-                            return make_token(lexer, TT_GREATER_EQUAL);
-                        }
-                        return make_token(lexer, TT_GREATER);
+		case '!':
+			if (*lexer->current == '=') {
+				next_char(lexer);
+				return make_token(lexer, TT_NOT_EQUAL);
+			}
+			break;
+		case '<':
+			if (*lexer->current == '=') {
+				next_char(lexer);
+				return make_token(lexer, TT_LESS_EQUAL);
+			}
+			return make_token(lexer, TT_LESS);
+		case '>':
+			if (*lexer->current == '=') {
+				next_char(lexer);
+				return make_token(lexer, TT_GREATER_EQUAL);
+			}
+			return make_token(lexer, TT_GREATER);
 		default:
 			break;
 	}
 
 	if (isdigit(ch)) {
 		while (isdigit(*lexer->current)) {
-                    next_char(lexer);
-                }
+			next_char(lexer);
+		}
 		return make_token(lexer, TT_NUMBER);
 	}
 
 	if (isalpha(ch)) {
 		while (isalpha(*lexer->current)) {
-                    next_char(lexer);
-                }
+			next_char(lexer);
+		}
 
 		char *name = lexer->start;
 		if (strncmp(name, KW_LET, strlen(KW_LET)) == 0) {

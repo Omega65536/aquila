@@ -1,7 +1,7 @@
 #include "token.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 bool token_equal(Token *a, Token *b) {
 	if (a->length != b->length) {
@@ -12,18 +12,18 @@ bool token_equal(Token *a, Token *b) {
 
 void print_token_type(FILE *file, TokenType *token_type) {
 	switch (*token_type) {
-                // Special
+		// Special
 		case TT_END:
 			fprintf(file, "End");
 			break;
 
-                // Keywords
+		// Keywords
 		case TT_LET:
 			fprintf(file, "'let'");
 			break;
-                case TT_FUNC:
-                        fprintf(file, "'func'");
-                        break;
+		case TT_FUNC:
+			fprintf(file, "'func'");
+			break;
 		case TT_PRINT:
 			fprintf(file, "'print'");
 			break;
@@ -46,7 +46,7 @@ void print_token_type(FILE *file, TokenType *token_type) {
 			fprintf(file, "'boolean'");
 			break;
 
-                // Delimiter
+		// Delimiter
 		case TT_SEMICOLON:
 			fprintf(file, "';'");
 			break;
@@ -66,7 +66,7 @@ void print_token_type(FILE *file, TokenType *token_type) {
 			fprintf(file, "'}'");
 			break;
 
-                // Operator
+		// Operator
 		case TT_EQUAL:
 			fprintf(file, "'='");
 			break;
@@ -83,26 +83,26 @@ void print_token_type(FILE *file, TokenType *token_type) {
 			fprintf(file, "'/'");
 			break;
 
-                case TT_DOUBLE_EQUAL:
-                        fprintf(file, "'=='");
-                        break;
-                case TT_NOT_EQUAL:
-                        fprintf(file, "'!='");
-                        break;
-                case TT_LESS:
-                        fprintf(file, "'<'");
-                        break;
-                case TT_LESS_EQUAL:
-                        fprintf(file, "'<='");
-                        break;
-                case TT_GREATER:
-                        fprintf(file, "'>'");
-                        break;
-                case TT_GREATER_EQUAL:
-                        fprintf(file, "'>='");
-                        break;
+		case TT_DOUBLE_EQUAL:
+			fprintf(file, "'=='");
+			break;
+		case TT_NOT_EQUAL:
+			fprintf(file, "'!='");
+			break;
+		case TT_LESS:
+			fprintf(file, "'<'");
+			break;
+		case TT_LESS_EQUAL:
+			fprintf(file, "'<='");
+			break;
+		case TT_GREATER:
+			fprintf(file, "'>'");
+			break;
+		case TT_GREATER_EQUAL:
+			fprintf(file, "'>='");
+			break;
 
-                // Other
+		// Other
 		case TT_NUMBER:
 			fprintf(file, "Number");
 			break;

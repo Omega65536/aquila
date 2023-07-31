@@ -1,8 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <stdbool.h>
 #include "token.h"
+#include <stdbool.h>
 
 typedef struct Lexer {
 	char *start;

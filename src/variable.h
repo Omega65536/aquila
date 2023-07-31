@@ -1,12 +1,12 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-#include "type.h"
 #include "token.h"
+#include "type.h"
 
 typedef struct Variable {
 	Token name;
-        Type type;
+	Type type;
 	int depth;
 } Variable;
 
