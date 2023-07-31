@@ -9,8 +9,10 @@
 #include "chunk.h"
 #include "token.h"
 #include "type.h"
+#include "variable.h"
 
 static void compile_statement(Compiler *compiler);
+static void compile_function(Compiler *compiler);
 static void compile_block(Compiler *compiler);
 static void compile_let(Compiler *compiler);
 static void compile_assignment(Compiler *compiler);
@@ -33,12 +35,6 @@ static void compile_negation(Compiler *compiler);
 
 static Token match(Compiler *compiler, TokenType type);
 
-static int resolve_variable(Compiler *compiler, Token *name);
-static void enter_block(Compiler *compiler);
-static void exit_block(Compiler *compiler);
-static void declare_variable(Compiler *compiler, Token name, Type type);
-static void mark_initializied(Compiler *compiler);
-
 static void push_type(Compiler *compiler, Type type);
 static Type pop_type(Compiler *compiler); 
 static void match_type(Compiler *compiler, Type expected);
@@ -48,17 +44,23 @@ void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
 	compiler->lexer = lexer;
 	compiler->chunk = chunk;
 
-	memset(compiler->variables, 0, 256 * sizeof(Variable));
-	compiler->variable_count = 0;
-	compiler->depth = 0;
+	init_variable_stack(&compiler->variable_stack);
 
         compiler->type_stackSize = 0;
 }
 
 void compile(Compiler *compiler) {
-	compile_block(compiler);
+        compile_function(compiler);
 	match(compiler, TT_END);
 	write_into_chunk(compiler->chunk, OP_EXIT);
+}
+
+static void compile_function(Compiler *compiler) {
+        match(compiler, TT_FUNC);
+        match(compiler, TT_NAME);
+        match(compiler, TT_LPAREN);
+        match(compiler, TT_RPAREN);
+        compile_block(compiler);
 }
 
 static void compile_statement(Compiler *compiler) {
@@ -86,7 +88,7 @@ static void compile_statement(Compiler *compiler) {
 
 static void compile_block(Compiler *compiler) {
 	match(compiler, TT_LCURLY);
-	enter_block(compiler);
+	enter_block(&compiler->variable_stack);
 	for (;;) {
 		Token token = peek_next_token(compiler->lexer);
 		if (token.type == TT_RCURLY || token.type == TT_END) {
@@ -94,7 +96,10 @@ static void compile_block(Compiler *compiler) {
 		}
 		compile_statement(compiler);
 	}
-	exit_block(compiler);
+	int pops = exit_block(&compiler->variable_stack);
+        for (int i = 0; i < pops; i++) {
+                write_into_chunk(compiler->chunk, OP_POP);
+        }
 	match(compiler, TT_RCURLY);
 }
 
@@ -102,22 +107,10 @@ static void compile_let(Compiler *compiler) {
 	match(compiler, TT_LET);
 	Token name = match(compiler, TT_NAME);
 
-	for (int i = compiler->variable_count - 1; i >= 0; --i) {
-		Variable *variable = &compiler->variables[i];
-		if (compiler->depth != -1 && variable->depth < compiler->depth) {
-			break;
-		}
-
-		if (token_equal(&name, &variable->name)) {
-			fprintf(stderr, "Variable already declared\n");
-                        exit(EXIT_FAILURE);
-		}
-	}
-
         match(compiler, TT_COLON);
         Type type = compile_type(compiler);
 
-	declare_variable(compiler, name, type);
+	declare_variable(&compiler->variable_stack, name, type);
 
 	match(compiler, TT_EQUAL);
 	compile_expression(compiler);
@@ -128,7 +121,7 @@ static void compile_let(Compiler *compiler) {
             type_error(type, expression_type);
         }
 
-	mark_initializied(compiler);
+	mark_initializied(&compiler->variable_stack);
 }
 
 static void compile_assignment(Compiler *compiler) {
@@ -137,8 +130,9 @@ static void compile_assignment(Compiler *compiler) {
         compile_expression(compiler);
 	match(compiler, TT_SEMICOLON);
 
-        int i = resolve_variable(compiler, &name);
-        match_type(compiler, pop_type(compiler));
+        int i = resolve_variable(&compiler->variable_stack, &name);
+        Variable *variable = &compiler->variable_stack.variables[i];
+        match_type(compiler, variable->type);
         write_into_chunk(compiler->chunk, OP_STORE);
         write_into_chunk(compiler->chunk, i);
 }
@@ -374,7 +368,9 @@ static void compile_name(Compiler *compiler) {
         Token token = get_next_token(compiler->lexer);
         write_into_chunk(compiler->chunk, OP_LOAD);
 
-        int i = resolve_variable(compiler, &token);
+        int i = resolve_variable(&compiler->variable_stack, &token);
+        Variable *v = &compiler->variable_stack.variables[i];
+        push_type(compiler, v->type);
         write_into_chunk(compiler->chunk, i);
 }
         
@@ -400,46 +396,6 @@ static Token match(Compiler *compiler, TokenType type) {
                 exit(EXIT_FAILURE);
 	}
 	return get_next_token(compiler->lexer);
-}
-
-static int resolve_variable(Compiler *compiler, Token *name) {
-	for (int i = compiler->variable_count - 1; i >= 0; --i) {
-		Variable *variable = &compiler->variables[i];
-		if (token_equal(&variable->name, name)) {
-			if (variable->depth != -1) {
-                            push_type(compiler, variable->type);
-                            return i;
-			}
-		}
-	}
-
-	fprintf(stderr, "Undeclared variable!\n");
-        exit(EXIT_FAILURE);
-}
-
-static void enter_block(Compiler *compiler) {
-	compiler->depth++;
-}
-
-static void exit_block(Compiler *compiler) {
-	compiler->depth--;
-
-	while (compiler->variable_count > 0 &&
-			compiler->variables[compiler->variable_count - 1].depth > compiler->depth) {
-		write_into_chunk(compiler->chunk, OP_POP);
-		compiler->variable_count--;
-	}
-}
-
-static void declare_variable(Compiler *compiler, Token name, Type type) {
-	Variable* variable = &compiler->variables[compiler->variable_count++];
-	variable->name = name;
-        variable->type = type;
-	variable->depth = -1;
-}
-
-static void mark_initializied(Compiler *compiler) {
-	compiler->variables[compiler->variable_count - 1].depth = compiler->depth;
 }
 
 static void push_type(Compiler *compiler, Type type) {

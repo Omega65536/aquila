@@ -10,6 +10,7 @@ typedef enum TokenType {
 	TT_UNKNOWN,
 
         // Keywords
+        TT_FUNC,
 	TT_LET,
 	TT_PRINT,
         TT_IF,

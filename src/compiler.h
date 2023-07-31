@@ -5,23 +5,14 @@
 #include "chunk.h"
 #include "lexer.h"
 #include "type.h"
+#include "variable.h"
 #include <stdbool.h>
-
-typedef struct Variable {
-	Token name;
-        Type type;
-	int depth;
-} Variable;
-
 
 typedef struct Compiler {
 	Lexer *lexer;
 	Chunk *chunk;
 
-	Variable variables[256];
-	int variable_count;
-	int depth;
-
+        VariableStack variable_stack;
 	Type type_stack[256];
 	int type_stackSize;
 } Compiler;
