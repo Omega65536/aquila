@@ -1,4 +1,4 @@
-func main() {
+func main(): integer {
     let a: integer = 1000;
     let b: boolean = true;
 
@@ -15,4 +15,6 @@ func main() {
 
     let c: integer = 3000;
     print(c);
+
+    return 0;
 }

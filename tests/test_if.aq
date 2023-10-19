@@ -1,4 +1,4 @@
-func main() {
+func main(): integer {
     if true {
         print(1);
     }
@@ -19,4 +19,6 @@ func main() {
         }
         print(6);
     }
+
+    return 0;
 }

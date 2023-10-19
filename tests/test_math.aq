@@ -1,6 +1,8 @@
-func main() {
+func main(): integer {
     print(2 + 3);
     print(10 - 5);
     print(6 * 7);
     print(81 / 8);
+
+    return 0;
 }

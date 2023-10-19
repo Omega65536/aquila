@@ -1,5 +1,7 @@
-func main() {
+func main(): integer {
     print(1000);
     print(true);
     print(false);
+
+    return 0;
 }

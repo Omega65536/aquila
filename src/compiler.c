@@ -77,7 +77,7 @@ void compile(Compiler *compiler) {
 	}
 	compiler->chunk->code[1] = main->index;
 
-	print_function_list(stdout, &compiler->flist);
+	// print_function_list(stdout, &compiler->flist);
 }
 
 static void compile_function(Compiler *compiler) {
@@ -119,6 +119,8 @@ static void compile_function(Compiler *compiler) {
 
 	f->index = compiler->chunk->length;
 	compile_block(compiler, type);
+
+	compiler->variable_stack.variable_count = 0;
 }
 
 static void compile_statement(Compiler *compiler, Type type) {
