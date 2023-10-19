@@ -2,11 +2,11 @@
 #define COMPILER_H
 
 #include "chunk.h"
+#include "function.h"
 #include "lexer.h"
 #include "token.h"
 #include "type.h"
 #include "variable.h"
-#include "function.h"
 #include <stdbool.h>
 
 typedef struct Compiler {
@@ -14,7 +14,7 @@ typedef struct Compiler {
 	Chunk *chunk;
 
 	VariableStack variable_stack;
-        FunctionList flist;
+	FunctionList flist;
 	Type type_stack[256];
 	int type_stackSize;
 } Compiler;

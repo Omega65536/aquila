@@ -47,35 +47,35 @@ void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
 	compiler->lexer = lexer;
 	compiler->chunk = chunk;
 	init_variable_stack(&compiler->variable_stack);
-        init_function_list(&compiler->flist);
+	init_function_list(&compiler->flist);
 	compiler->type_stackSize = 0;
 }
 
 void free_compiler(Compiler *compiler) {
-        free_variable_stack(&compiler->variable_stack);
+	free_variable_stack(&compiler->variable_stack);
 }
 
 void compile(Compiler *compiler) {
-        write_into_chunk(compiler->chunk, OP_CALL);
-        write_into_chunk(compiler->chunk, -1);
-        write_into_chunk(compiler->chunk, OP_EXIT);
-        for (;;) {
-                Token token = peek_next_token(compiler->lexer);
-                if (token.type == TT_END) {
-                        break;
-                }
-                compile_function(compiler);
-        }
+	write_into_chunk(compiler->chunk, OP_CALL);
+	write_into_chunk(compiler->chunk, -1);
+	write_into_chunk(compiler->chunk, OP_EXIT);
+	for (;;) {
+		Token token = peek_next_token(compiler->lexer);
+		if (token.type == TT_END) {
+			break;
+		}
+		compile_function(compiler);
+	}
 	match(compiler, TT_END);
 
-        Function *main = find_main_function(&compiler->flist);
-        if (main == NULL) {
-            fprintf(stderr, "No main function\n");
-            exit(EXIT_FAILURE);
-        }
-        compiler->chunk->code[1] = main->index;
+	Function *main = find_main_function(&compiler->flist);
+	if (main == NULL) {
+		fprintf(stderr, "No main function\n");
+		exit(EXIT_FAILURE);
+	}
+	compiler->chunk->code[1] = main->index;
 
-        print_function_list(stdout, &compiler->flist);
+	print_function_list(stdout, &compiler->flist);
 }
 
 static void compile_function(Compiler *compiler) {
@@ -83,13 +83,13 @@ static void compile_function(Compiler *compiler) {
 	Token name = match(compiler, TT_NAME);
 	match(compiler, TT_LPAREN);
 	match(compiler, TT_RPAREN);
-        match(compiler, TT_COLON);
-        Type type = compile_type(compiler);
+	match(compiler, TT_COLON);
+	Type type = compile_type(compiler);
 
-        Function *f = add_function(&compiler->flist);
-        f->name = name;
-        f->return_type = type;
-        f->index = compiler->chunk->length;
+	Function *f = add_function(&compiler->flist);
+	f->name = name;
+	f->return_type = type;
+	f->index = compiler->chunk->length;
 	compile_block(compiler, type);
 }
 
@@ -99,9 +99,9 @@ static void compile_statement(Compiler *compiler, Type type) {
 		case TT_LCURLY:
 			compile_block(compiler, type);
 			break;
-                case TT_RETURN:
-                        compile_return(compiler, type);
-                        break;
+		case TT_RETURN:
+			compile_return(compiler, type);
+			break;
 		case TT_LET:
 			compile_let(compiler);
 			break;
@@ -137,17 +137,17 @@ static void compile_block(Compiler *compiler, Type type) {
 }
 
 static void compile_return(Compiler *compiler, Type type) {
-        match(compiler, TT_RETURN);
-        compile_expression(compiler);
-        match(compiler, TT_SEMICOLON);
+	match(compiler, TT_RETURN);
+	compile_expression(compiler);
+	match(compiler, TT_SEMICOLON);
 
-        Type ret_type = pop_type(compiler);
-        printf("%d\n", ret_type);
-        if (ret_type != type) {
-                type_error(type, ret_type);
-        }
+	Type ret_type = pop_type(compiler);
+	printf("%d\n", ret_type);
+	if (ret_type != type) {
+		type_error(type, ret_type);
+	}
 
-        write_into_chunk(compiler->chunk, OP_RETURN);
+	write_into_chunk(compiler->chunk, OP_RETURN);
 }
 
 static void compile_let(Compiler *compiler) {
@@ -413,12 +413,12 @@ static void compile_unary(Compiler *compiler) {
 
 static void compile_name_or_call(Compiler *compiler) {
 	Token token = get_next_token(compiler->lexer);
-        Token next = peek_next_token(compiler->lexer);
-        if (next.type == TT_LPAREN) {
-            compile_call(compiler, token);
-        } else {
-            compile_name(compiler, token);
-        }
+	Token next = peek_next_token(compiler->lexer);
+	if (next.type == TT_LPAREN) {
+		compile_call(compiler, token);
+	} else {
+		compile_name(compiler, token);
+	}
 }
 
 static void compile_name(Compiler *compiler, Token token) {
@@ -431,19 +431,19 @@ static void compile_name(Compiler *compiler, Token token) {
 }
 
 static void compile_call(Compiler *compiler, Token token) {
-        match(compiler, TT_LPAREN);
-        match(compiler, TT_RPAREN);
+	match(compiler, TT_LPAREN);
+	match(compiler, TT_RPAREN);
 
-        Function *f = find_function(&compiler->flist, &token);
-        if (f == NULL) {
-            fprintf(stderr, "Name Error: Unknown Function");
-            exit(EXIT_FAILURE);
-        }
+	Function *f = find_function(&compiler->flist, &token);
+	if (f == NULL) {
+		fprintf(stderr, "Name Error: Unknown Function");
+		exit(EXIT_FAILURE);
+	}
 
-        push_type(compiler, f->return_type);
+	push_type(compiler, f->return_type);
 
-        write_into_chunk(compiler->chunk, OP_CALL);
-        write_into_chunk(compiler->chunk, f->index);
+	write_into_chunk(compiler->chunk, OP_CALL);
+	write_into_chunk(compiler->chunk, f->index);
 }
 
 static void compile_negation(Compiler *compiler) {

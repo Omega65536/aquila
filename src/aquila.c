@@ -38,7 +38,7 @@ void run(char *source, bool only_compile) {
 	Compiler compiler;
 	init_compiler(&compiler, &lexer, &chunk);
 	compile(&compiler);
-        free_compiler(&compiler);
+	free_compiler(&compiler);
 
 	if (only_compile) {
 		print_chunk(&chunk);
