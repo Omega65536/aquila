@@ -11,6 +11,7 @@ typedef enum TokenType {
 
 	// Keywords
 	TT_FUNC,
+        TT_RETURN,
 	TT_LET,
 	TT_PRINT,
 	TT_IF,

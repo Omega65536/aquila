@@ -96,6 +96,12 @@ void print_chunk(Chunk *chunk) {
 			case OP_JUMP_IF_FALSE:
 				printf("JUMP_IF_FALSE %d", chunk->code[++i]);
 				break;
+			case OP_CALL:
+				printf("CALL %d", chunk->code[++i]);
+				break;
+			case OP_RETURN:
+				printf("RETURN");
+				break;
 			default:
 				printf("UNKNOWN OP: %d", chunk->code[i]);
 				break;

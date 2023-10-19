@@ -27,7 +27,7 @@ void free_interpreter(Interpreter *interpreter) {
 int interpret(Interpreter *interpreter) {
 	for (;;) {
 		OpCode op_code = next(interpreter);
-		// printf("%d: %d\n", i, op_code);
+		//printf("%d: %d\n", interpreter->index-1, op_code);
 		switch (op_code) {
 			case OP_NOOP:
 				break;
@@ -164,6 +164,19 @@ int interpret(Interpreter *interpreter) {
 				interpreter->index = dest;
 				break;
 			}
+                        case OP_CALL: {
+                                int dest = next(interpreter);
+                                push(interpreter, make_integer(interpreter->index));
+                                interpreter->index = dest;
+                                break;
+                        }
+                        case OP_RETURN: {
+                                Object ret_value = pop(interpreter);
+                                int ret_addr = pop(interpreter).integer;
+                                push(interpreter, ret_value);
+                                interpreter->index = ret_addr;
+                                break;
+                        }
 			default:
 				fprintf(stderr, "Invalid opcode: %d\n",
 					op_code);
@@ -173,7 +186,7 @@ int interpret(Interpreter *interpreter) {
 #ifdef DEBUG
 		printf("STACK: ");
 		for (int j = 0; j < interpreter->length; ++j) {
-			printf("%d, ", interpreter->stack[j]);
+			printf("%d, ", interpreter->stack[j].integer);
 		}
 		printf("\n");
 #endif

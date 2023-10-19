@@ -24,6 +24,9 @@ void print_token_type(FILE *file, TokenType *token_type) {
 		case TT_FUNC:
 			fprintf(file, "'func'");
 			break;
+		case TT_RETURN:
+			fprintf(file, "'return'");
+			break;
 		case TT_PRINT:
 			fprintf(file, "'print'");
 			break;

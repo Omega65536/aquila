@@ -1,6 +1,12 @@
-func main() {
-    let i: integer = 0;
-    if i == 0 {
-    }
-    print(i);
+func a(): integer {
+    return 42;
+}
+
+func b(): integer {
+    return a() + 1;
+}
+
+func main(): integer {
+    print(b());
+    return 0;
 }
