@@ -6,11 +6,23 @@
 void print_function(FILE *file, Function *function) {
 	print_token(file, &function->name);
 	fprintf(file, ": ");
+	for (int i = 0; i < function->parameter_count; i++) {
+		print_type(file, function->parameter_types[i]);
+		fprintf(file, ", ");
+	}
+	fprintf(file, " returns ");
 	print_type(file, function->return_type);
 	fprintf(file, " @ %d\n", function->index);
 }
 
 void add_parameter_type(Function *function, Type type) {
+	if (function->parameter_count == function->parameter_capacity) {
+		function->parameter_capacity *= 2;
+		int new_size = function->parameter_capacity * sizeof(Type);
+		function->parameter_types =
+		    realloc(function->parameter_types, new_size);
+	}
+	function->parameter_types[function->parameter_count++] = type;
 }
 
 void init_function_list(FunctionList *flist) {
@@ -29,7 +41,11 @@ Function *add_function(FunctionList *flist) {
 		int new_size = flist->capacity * sizeof(Function);
 		flist->functions = realloc(flist->functions, new_size);
 	}
-	return &flist->functions[flist->count++];
+	Function *function = &flist->functions[flist->count++];
+	function->parameter_types = malloc(4 * sizeof(Type));
+	function->parameter_count = 0;
+	function->parameter_capacity = 4;
+	return function;
 }
 
 Function *find_function(FunctionList *flist, Token *name) {

@@ -21,7 +21,9 @@ int resolve_variable(VariableStack *vs, Token *name) {
 		}
 	}
 
-	fprintf(stderr, "Undeclared variable!\n");
+	fprintf(stderr, "Undeclared variable: ");
+	print_token(stderr, name);
+	fprintf(stderr, "\n");
 	exit(EXIT_FAILURE);
 }
 

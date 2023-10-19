@@ -24,6 +24,7 @@ typedef enum TokenType {
 	// Delimiter
 	TT_SEMICOLON,
 	TT_COLON,
+	TT_COMMA,
 	TT_LPAREN,
 	TT_RPAREN,
 	TT_LCURLY,

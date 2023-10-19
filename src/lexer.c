@@ -74,6 +74,8 @@ Token advance_lexer(Lexer *lexer) {
 			return make_token(lexer, TT_SEMICOLON);
 		case ':':
 			return make_token(lexer, TT_COLON);
+		case ',':
+			return make_token(lexer, TT_COMMA);
 		case '(':
 			return make_token(lexer, TT_LPAREN);
 		case ')':

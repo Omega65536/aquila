@@ -4,6 +4,11 @@
 #include "chunk.h"
 #include <stdbool.h>
 
+typedef struct Frame {
+	int return_address;
+	int offset;
+} Frame;
+
 typedef union Object {
 	int integer;
 	bool boolean;
@@ -12,9 +17,11 @@ typedef union Object {
 typedef struct Interpreter {
 	Chunk *chunk;
 	int index;
+	int offset;
 	Object *stack;
-	int length;
-	int capacity;
+	int stack_length;
+	Frame *frames;
+	int frame_count;
 } Interpreter;
 
 void init_interpreter(Interpreter *interpreter, Chunk *chunk);

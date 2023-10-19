@@ -15,9 +15,11 @@ static Object make_boolean(bool value);
 void init_interpreter(Interpreter *interpreter, Chunk *chunk) {
 	interpreter->chunk = chunk;
 	interpreter->index = 0;
-	interpreter->stack = malloc(4 * sizeof(Object));
-	interpreter->length = 0;
-	interpreter->capacity = 4;
+	interpreter->offset = 0;
+	interpreter->stack = malloc(256 * sizeof(Object));
+	interpreter->stack_length = 0;
+	interpreter->frames = malloc(256 * sizeof(Frame));
+	interpreter->frame_count = 0;
 }
 
 void free_interpreter(Interpreter *interpreter) {
@@ -27,13 +29,17 @@ void free_interpreter(Interpreter *interpreter) {
 int interpret(Interpreter *interpreter) {
 	for (;;) {
 		OpCode op_code = next(interpreter);
-		// printf("%d: %d\n", interpreter->index-1, op_code);
+		// printf("INDEX: %d, OFFSET: %d\n", interpreter->index-1,
+		// interpreter->offset);
 		switch (op_code) {
 			case OP_NOOP:
 				break;
 			case OP_EXIT:
 				return 0;
 			case OP_PUSH_INTEGER: {
+#ifdef DEBUG
+				printf("PUSH_INTEGER\n");
+#endif
 				int value = next(interpreter);
 				push(interpreter, make_integer(value));
 				break;
@@ -51,14 +57,24 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_LOAD: {
+#ifdef DEBUG
+				printf("LOAD\n");
+#endif
 				int index = next(interpreter);
-				push(interpreter, interpreter->stack[index]);
+				push(interpreter,
+				     interpreter
+					 ->stack[interpreter->offset + index]);
 				break;
 			}
 			case OP_STORE: {
+#ifdef DEBUG
+				printf("STORE\n");
+#endif
 				int index = next(interpreter);
 				Object object = pop(interpreter);
-				interpreter->stack[index] = object;
+				interpreter
+				    ->stack[interpreter->offset + index] =
+				    object;
 				break;
 			}
 			case OP_PRINT_INTEGER: {
@@ -76,6 +92,9 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_ADD: {
+#ifdef DEBUG
+				printf("ADD\n");
+#endif
 				int a = pop(interpreter).integer;
 				int b = pop(interpreter).integer;
 				int result = b + a;
@@ -165,17 +184,37 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_CALL: {
+#ifdef DEBUG
+				printf("CALL\n");
+#endif
+				Frame *frame =
+				    &interpreter
+					 ->frames[interpreter->frame_count++];
+				frame->offset = interpreter->offset;
+				interpreter->offset = interpreter->stack_length;
+
 				int dest = next(interpreter);
-				push(interpreter,
-				     make_integer(interpreter->index));
+				int parameter_count = next(interpreter);
+				interpreter->offset -= parameter_count;
+				frame->return_address = interpreter->index;
 				interpreter->index = dest;
 				break;
 			}
 			case OP_RETURN: {
-				Object ret_value = pop(interpreter);
-				int ret_addr = pop(interpreter).integer;
-				push(interpreter, ret_value);
-				interpreter->index = ret_addr;
+#ifdef DEBUG
+				printf("RETURN\n");
+#endif
+				Object return_value = pop(interpreter);
+				int pops = next(interpreter);
+				for (int i = 0; i < pops; i++) {
+					pop(interpreter);
+				}
+				push(interpreter, return_value);
+				Frame *frame =
+				    &interpreter
+					 ->frames[--interpreter->frame_count];
+				interpreter->index = frame->return_address;
+				interpreter->offset = frame->offset;
 				break;
 			}
 			default:
@@ -185,8 +224,11 @@ int interpret(Interpreter *interpreter) {
 				break;
 		}
 #ifdef DEBUG
-		printf("STACK: ");
-		for (int j = 0; j < interpreter->length; ++j) {
+		for (int i = 0; i < interpreter->frame_count; i++) {
+			printf("    ");
+		}
+		printf("\\- Stack: ");
+		for (int j = 0; j < interpreter->stack_length; ++j) {
 			printf("%d, ", interpreter->stack[j].integer);
 		}
 		printf("\n");
@@ -201,17 +243,11 @@ static uint32_t next(Interpreter *interpreter) {
 }
 
 static void push(Interpreter *interpreter, Object value) {
-	if (interpreter->length == interpreter->capacity) {
-		interpreter->capacity *= 2;
-		int new_size = interpreter->capacity * sizeof(Object);
-		interpreter->stack = realloc(interpreter->stack, new_size);
-	}
-	interpreter->stack[interpreter->length] = value;
-	interpreter->length++;
+	interpreter->stack[interpreter->stack_length++] = value;
 }
 
 static Object pop(Interpreter *interpreter) {
-	return interpreter->stack[--interpreter->length];
+	return interpreter->stack[--interpreter->stack_length];
 }
 
 static Object make_integer(int value) {

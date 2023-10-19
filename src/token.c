@@ -56,6 +56,9 @@ void print_token_type(FILE *file, TokenType *token_type) {
 		case TT_COLON:
 			fprintf(file, "':'");
 			break;
+		case TT_COMMA:
+			fprintf(file, "','");
+			break;
 		case TT_LPAREN:
 			fprintf(file, "'('");
 			break;
