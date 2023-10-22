@@ -36,6 +36,7 @@ static void compile_name(Compiler *compiler, Token token);
 static void compile_call(Compiler *compiler, Token token);
 static void compile_negation(Compiler *compiler);
 
+static void error(Compiler *compiler);
 static Token match(Compiler *compiler, TokenType type);
 
 static void push_type(Compiler *compiler, Type type);
@@ -77,7 +78,7 @@ void compile(Compiler *compiler) {
 	}
 	compiler->chunk->code[1] = main->index;
 
-	//print_function_list(stdout, &compiler->flist);
+	// print_function_list(stdout, &compiler->flist);
 }
 
 static void compile_function(Compiler *compiler) {
@@ -176,6 +177,7 @@ static void compile_return(Compiler *compiler, Type type) {
 
 	Type ret_type = pop_type(compiler);
 	if (ret_type != type) {
+		error(compiler);
 		type_error(type, ret_type);
 	}
 
@@ -199,6 +201,7 @@ static void compile_let(Compiler *compiler) {
 
 	Type expression_type = pop_type(compiler);
 	if (expression_type != type) {
+		error(compiler);
 		type_error(type, expression_type);
 	}
 
@@ -226,6 +229,7 @@ static Type compile_type(Compiler *compiler) {
 		case TT_BOOLEAN:
 			return TY_BOOLEAN;
 		default:
+			error(compiler);
 			fprintf(stderr, "Unknown type\n");
 			exit(EXIT_FAILURE);
 	}
@@ -309,10 +313,12 @@ static void compile_comparison(Compiler *compiler) {
 
 	Type first_type = pop_type(compiler);
 	if (first_type != TY_INTEGER) {
+		error(compiler);
 		type_error(TY_INTEGER, first_type);
 	}
 	Type second_type = pop_type(compiler);
 	if (second_type != TY_INTEGER) {
+		error(compiler);
 		type_error(TY_INTEGER, first_type);
 	}
 	push_type(compiler, TY_BOOLEAN);
@@ -437,6 +443,7 @@ static void compile_unary(Compiler *compiler) {
 			break;
 		}
 		default: {
+			error(compiler);
 			fprintf(stderr, "Syntax Error: Unexpected token ");
 			print_token(stderr, &token);
 			fprintf(stderr, " while parsing expression\n");
@@ -467,27 +474,45 @@ static void compile_name(Compiler *compiler, Token token) {
 static void compile_call(Compiler *compiler, Token token) {
 	Function *f = find_function(&compiler->flist, &token);
 	if (f == NULL) {
-		fprintf(stderr, "Name Error: Unknown Function");
+		error(compiler);
+		fprintf(stderr, "Name Error: Unknown Function\n");
 		exit(EXIT_FAILURE);
 	}
 
 	match(compiler, TT_LPAREN);
+	int num_args = 0;
 	if (token.type != TT_RPAREN) {
 		compile_expression(compiler);
-                match_type(compiler, f->parameter_types[0]);
+		match_type(compiler, f->parameter_types[num_args++]);
 
-		for (int i = 1;; i++) {
+		for (;;) {
 			Token token = peek_next_token(compiler->lexer);
 			if (token.type == TT_RPAREN) {
 				break;
 			}
+			if (num_args >= f->parameter_count) {
+				error(compiler);
+				fprintf(stderr,
+					"Function Error: Expected %d arguments "
+					"but received %d\n",
+					f->parameter_count, num_args + 1);
+				exit(EXIT_FAILURE);
+			}
 			match(compiler, TT_COMMA);
 			compile_expression(compiler);
-                        match_type(compiler, f->parameter_types[i]);
+			match_type(compiler, f->parameter_types[num_args++]);
 		}
 	}
 	match(compiler, TT_RPAREN);
 
+	if (num_args != f->parameter_count) {
+		error(compiler);
+		fprintf(
+		    stderr,
+		    "Function Error: Expected %d arguments but received %d\n",
+		    f->parameter_count, num_args);
+		exit(EXIT_FAILURE);
+	}
 
 	push_type(compiler, f->return_type);
 
@@ -506,9 +531,14 @@ static void compile_negation(Compiler *compiler) {
 	write_into_chunk(compiler->chunk, OP_NEGATE);
 }
 
+static void error(Compiler *compiler) {
+	fprintf(stderr, "Line %d: ", compiler->lexer->line_number);
+}
+
 static Token match(Compiler *compiler, TokenType type) {
 	Token token = peek_next_token(compiler->lexer);
 	if (token.type != type) {
+		error(compiler);
 		fprintf(stderr, "Syntax Error: Expected ");
 		print_token_type(stderr, &type);
 		fprintf(stderr, " but found ");
@@ -530,6 +560,7 @@ static Type pop_type(Compiler *compiler) {
 static void match_type(Compiler *compiler, Type expected) {
 	Type found = pop_type(compiler);
 	if (found != expected) {
+		error(compiler);
 		type_error(expected, found);
 	}
 }

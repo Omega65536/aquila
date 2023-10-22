@@ -9,6 +9,7 @@ typedef struct Lexer {
 	char *current;
 	bool has_peeked;
 	Token peeked_token;
+	int line_number;
 } Lexer;
 
 void init_lexer(Lexer *lexer, char *source);

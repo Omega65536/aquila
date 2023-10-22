@@ -24,6 +24,7 @@ void init_lexer(Lexer *lexer, char *source) {
 	lexer->start = source;
 	lexer->current = source;
 	lexer->has_peeked = false;
+	lexer->line_number = 1;
 }
 
 Token make_token(Lexer *lexer, TokenType type) {
@@ -57,6 +58,10 @@ Token advance_lexer(Lexer *lexer) {
 	for (;;) {
 		if (*lexer->current == '\0') {
 			return make_token(lexer, TT_END);
+		}
+
+		if (*lexer->current == '\n') {
+			lexer->line_number++;
 		}
 
 		if (!isspace(*lexer->current)) {
