@@ -1,19 +1,13 @@
-func f(x: integer): integer {
-    if (x == 0) {
-        return 0;
-    }
-    if (x == 1) {
-        return 1;
-    }
-    return f(x - 1) + f(x - 2);
+func a(x: integer, y: boolean): integer {
+    return x;
 }
 
+func b(x: integer): integer {
+    return x * x;
+}
 
 func main(): integer {
-    let i: integer = 0;
-    while (i < 10) {
-        print(f(i));
-        i = i + 1;
-    }
+    print(a(1,true));
+    print(b(3));
     return 0;
 }

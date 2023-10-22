@@ -77,7 +77,7 @@ void compile(Compiler *compiler) {
 	}
 	compiler->chunk->code[1] = main->index;
 
-	// print_function_list(stdout, &compiler->flist);
+	//print_function_list(stdout, &compiler->flist);
 }
 
 static void compile_function(Compiler *compiler) {
@@ -93,6 +93,7 @@ static void compile_function(Compiler *compiler) {
 		Token name = match(compiler, TT_NAME);
 		match(compiler, TT_COLON);
 		Type type = compile_type(compiler);
+
 		declare_variable(&compiler->variable_stack, name, type);
 		mark_initializied(&compiler->variable_stack);
 		add_parameter_type(f, type);
@@ -102,10 +103,12 @@ static void compile_function(Compiler *compiler) {
 			if (token.type == TT_RPAREN) {
 				break;
 			}
+
 			match(compiler, TT_COMMA);
 			Token name = match(compiler, TT_NAME);
 			match(compiler, TT_COLON);
 			Type type = compile_type(compiler);
+
 			declare_variable(&compiler->variable_stack, name, type);
 			mark_initializied(&compiler->variable_stack);
 			add_parameter_type(f, type);
@@ -462,26 +465,29 @@ static void compile_name(Compiler *compiler, Token token) {
 }
 
 static void compile_call(Compiler *compiler, Token token) {
+	Function *f = find_function(&compiler->flist, &token);
+	if (f == NULL) {
+		fprintf(stderr, "Name Error: Unknown Function");
+		exit(EXIT_FAILURE);
+	}
+
 	match(compiler, TT_LPAREN);
 	if (token.type != TT_RPAREN) {
 		compile_expression(compiler);
+                match_type(compiler, f->parameter_types[0]);
 
-		for (;;) {
+		for (int i = 1;; i++) {
 			Token token = peek_next_token(compiler->lexer);
 			if (token.type == TT_RPAREN) {
 				break;
 			}
 			match(compiler, TT_COMMA);
 			compile_expression(compiler);
+                        match_type(compiler, f->parameter_types[i]);
 		}
 	}
 	match(compiler, TT_RPAREN);
 
-	Function *f = find_function(&compiler->flist, &token);
-	if (f == NULL) {
-		fprintf(stderr, "Name Error: Unknown Function");
-		exit(EXIT_FAILURE);
-	}
 
 	push_type(compiler, f->return_type);
 
