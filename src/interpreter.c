@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 //#define DEBUG
+//#define DEBUG_STACK
 
 static uint32_t next(Interpreter *interpreter);
 static void push(Interpreter *interpreter, Object value);
@@ -28,6 +29,9 @@ void free_interpreter(Interpreter *interpreter) {
 
 int interpret(Interpreter *interpreter) {
 	for (;;) {
+#ifdef DEBUG
+		print_op_code(interpreter->chunk, interpreter->index);
+#endif
 		OpCode op_code = next(interpreter);
 		// printf("INDEX: %d, OFFSET: %d\n", interpreter->index-1,
 		// interpreter->offset);
@@ -37,9 +41,6 @@ int interpret(Interpreter *interpreter) {
 			case OP_EXIT:
 				return 0;
 			case OP_PUSH_INTEGER: {
-#ifdef DEBUG
-				printf("PUSH_INTEGER\n");
-#endif
 				int value = next(interpreter);
 				push(interpreter, make_integer(value));
 				break;
@@ -57,24 +58,20 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_LOAD: {
-#ifdef DEBUG
-				printf("LOAD\n");
-#endif
 				int index = next(interpreter);
-				push(interpreter,
-				     interpreter
-					 ->stack[interpreter->offset + index]);
+				int var_index = interpreter->offset + index;
+				Object var_value =
+				    interpreter->stack[var_index];
+				push(interpreter, var_value);
 				break;
 			}
 			case OP_STORE: {
-#ifdef DEBUG
-				printf("STORE\n");
-#endif
 				int index = next(interpreter);
+				int var_index = interpreter->offset + index;
+				Object *var_location =
+				    &interpreter->stack[var_index];
 				Object object = pop(interpreter);
-				interpreter
-				    ->stack[interpreter->offset + index] =
-				    object;
+				*var_location = object;
 				break;
 			}
 			case OP_PRINT_INTEGER: {
@@ -92,9 +89,6 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_ADD: {
-#ifdef DEBUG
-				printf("ADD\n");
-#endif
 				int a = pop(interpreter).integer;
 				int b = pop(interpreter).integer;
 				int result = b + a;
@@ -184,12 +178,9 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_CALL: {
-#ifdef DEBUG
-				printf("CALL\n");
-#endif
+				int frame_index = interpreter->frame_count++;
 				Frame *frame =
-				    &interpreter
-					 ->frames[interpreter->frame_count++];
+				    &interpreter->frames[frame_index];
 				frame->offset = interpreter->offset;
 				interpreter->offset = interpreter->stack_length;
 
@@ -201,18 +192,16 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_RETURN: {
-#ifdef DEBUG
-				printf("RETURN\n");
-#endif
 				Object return_value = pop(interpreter);
 				int pops = next(interpreter);
 				for (int i = 0; i < pops; i++) {
 					pop(interpreter);
 				}
 				push(interpreter, return_value);
+
+				int frame_index = --interpreter->frame_count;
 				Frame *frame =
-				    &interpreter
-					 ->frames[--interpreter->frame_count];
+				    &interpreter->frames[frame_index];
 				interpreter->index = frame->return_address;
 				interpreter->offset = frame->offset;
 				break;
@@ -223,7 +212,7 @@ int interpret(Interpreter *interpreter) {
 				exit(EXIT_FAILURE);
 				break;
 		}
-#ifdef DEBUG
+#ifdef DEBUG_STACK
 		for (int i = 0; i < interpreter->frame_count; i++) {
 			printf("    ");
 		}
@@ -234,7 +223,6 @@ int interpret(Interpreter *interpreter) {
 		printf("\n");
 #endif
 	}
-	// return pop(interpreter);
 	return 0;
 }
 

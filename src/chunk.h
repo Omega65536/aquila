@@ -47,5 +47,6 @@ void init_chunk(Chunk *chunk);
 void free_chunk(Chunk *chunk);
 void write_into_chunk(Chunk *chunk, uint32_t word);
 void print_chunk(Chunk *chunk);
+void print_op_code(Chunk *chunk, int index);
 
 #endif
