@@ -415,7 +415,7 @@ static void compile_unary(Compiler *compiler) {
 	switch (token.type) {
 		case TT_NUMBER: {
 			get_next_token(compiler->lexer);
-			write_into_chunk(chunk, OP_PUSH_INTEGER);
+			write_into_chunk(chunk, OP_PUSH);
 			int n = atoi(token.start);
 			write_into_chunk(chunk, n);
 			push_type(compiler, TY_INTEGER);
@@ -423,20 +423,22 @@ static void compile_unary(Compiler *compiler) {
 		}
 		case TT_TRUE: {
 			get_next_token(compiler->lexer);
-			write_into_chunk(chunk, OP_PUSH_TRUE);
+			write_into_chunk(chunk, OP_PUSH);
+			write_into_chunk(chunk, AQ_TRUE);
 			push_type(compiler, TY_BOOLEAN);
 			break;
 		}
 		case TT_FALSE: {
 			get_next_token(compiler->lexer);
-			write_into_chunk(chunk, OP_PUSH_FALSE);
+			write_into_chunk(chunk, OP_PUSH);
+			write_into_chunk(chunk, AQ_FALSE);
 			push_type(compiler, TY_BOOLEAN);
 			break;
 		}
                 case TT_UNIT: {
                         get_next_token(compiler->lexer);
-                        write_into_chunk(chunk, OP_PUSH_INTEGER);
-                        write_into_chunk(chunk, 0);
+                        write_into_chunk(chunk, OP_PUSH);
+                        write_into_chunk(chunk, AQ_UNIT);
                         push_type(compiler, TY_UNIT);
                         break;
                 }

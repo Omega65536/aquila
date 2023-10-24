@@ -40,17 +40,9 @@ int interpret(Interpreter *interpreter) {
 				break;
 			case OP_EXIT:
 				return 0;
-			case OP_PUSH_INTEGER: {
+			case OP_PUSH: {
 				int value = next(interpreter);
 				push(interpreter, make_integer(value));
-				break;
-			}
-			case OP_PUSH_TRUE: {
-				push(interpreter, make_boolean(true));
-				break;
-			}
-			case OP_PUSH_FALSE: {
-				push(interpreter, make_boolean(false));
 				break;
 			}
 			case OP_POP: {
@@ -85,8 +77,8 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_PRINT_BOOLEAN: {
-				bool value = pop(interpreter).boolean;
-				if (value) {
+				int value = pop(interpreter).integer;
+				if (value == AQ_TRUE) {
 					printf("true\n");
 				} else {
 					printf("false\n");
@@ -170,9 +162,9 @@ int interpret(Interpreter *interpreter) {
 				break;
 			}
 			case OP_JUMP_IF_FALSE: {
-				bool cond = pop(interpreter).boolean;
+				int cond = pop(interpreter).integer;
 				int dest = next(interpreter);
-				if (!cond) {
+				if (cond == AQ_FALSE) {
 					interpreter->index = dest;
 				}
 				break;
@@ -251,6 +243,6 @@ static Object make_integer(int value) {
 
 static Object make_boolean(bool value) {
 	Object object;
-	object.boolean = value;
+	object.integer = value ? AQ_TRUE : AQ_FALSE;
 	return object;
 }

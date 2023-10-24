@@ -11,7 +11,6 @@ typedef struct Frame {
 
 typedef union Object {
 	int integer;
-	bool boolean;
 } Object;
 
 typedef struct Interpreter {

@@ -8,9 +8,7 @@ typedef enum OpCode {
 	OP_EXIT,
 	OP_POP,
 
-	OP_PUSH_INTEGER,
-	OP_PUSH_TRUE,
-	OP_PUSH_FALSE,
+	OP_PUSH,
 	OP_LOAD,
 	OP_STORE,
 
@@ -43,6 +41,10 @@ typedef struct Chunk {
 	int length;
 	int capacity;
 } Chunk;
+
+extern const int AQ_UNIT;
+extern const int AQ_TRUE;
+extern const int AQ_FALSE;
 
 void init_chunk(Chunk *chunk);
 void free_chunk(Chunk *chunk);

@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const int AQ_UNIT = 0;
+const int AQ_TRUE = 1;
+const int AQ_FALSE = 0;
+
 void init_chunk(Chunk *chunk) {
 	chunk->code = malloc(4 * sizeof(uint32_t));
 	chunk->length = 0;
@@ -42,15 +46,9 @@ int print_op_code(Chunk *chunk, int index) {
 		case OP_POP:
 			printf("POP\n");
 			return index + 1;
-		case OP_PUSH_INTEGER:
-			printf("PUSH_INTEGER %d\n", chunk->code[index + 1]);
+		case OP_PUSH:
+			printf("PUSH %d\n", chunk->code[index + 1]);
 			return index + 2;
-		case OP_PUSH_TRUE:
-			printf("PUSH_TRUE\n");
-			return index + 1;
-		case OP_PUSH_FALSE:
-			printf("PUSH_FALSE\n");
-			return index + 1;
 		case OP_LOAD:
 			printf("LOAD %d\n", chunk->code[index + 1]);
 			return index + 2;
