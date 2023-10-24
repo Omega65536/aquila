@@ -14,6 +14,7 @@ typedef enum OpCode {
 	OP_LOAD,
 	OP_STORE,
 
+	OP_PRINT_UNIT,
 	OP_PRINT_INTEGER,
 	OP_PRINT_BOOLEAN,
 
@@ -47,6 +48,6 @@ void init_chunk(Chunk *chunk);
 void free_chunk(Chunk *chunk);
 void write_into_chunk(Chunk *chunk, uint32_t word);
 void print_chunk(Chunk *chunk);
-void print_op_code(Chunk *chunk, int index);
+int print_op_code(Chunk *chunk, int index);
 
 #endif

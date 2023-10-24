@@ -18,6 +18,7 @@ typedef enum TokenType {
 	TT_WHILE,
 	TT_TRUE,
 	TT_FALSE,
+        TT_UNIT,
 	TT_INTEGER,
 	TT_BOOLEAN,
 

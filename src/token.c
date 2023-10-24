@@ -42,6 +42,9 @@ void print_token_type(FILE *file, TokenType *token_type) {
 		case TT_FALSE:
 			fprintf(file, "'false'");
 			break;
+                case TT_UNIT:
+                        fprintf(file, "'unit'");
+                        break;
 		case TT_INTEGER:
 			fprintf(file, "'integer'");
 			break;

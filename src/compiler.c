@@ -118,11 +118,11 @@ static void compile_function(Compiler *compiler) {
 	match(compiler, TT_RPAREN);
 
 	match(compiler, TT_COLON);
-	Type type = compile_type(compiler);
-	f->return_type = type;
+	Type return_type = compile_type(compiler);
+	f->return_type = return_type;
 
 	f->index = compiler->chunk->length;
-	compile_block(compiler, type);
+	compile_block(compiler, return_type);
 
 	compiler->variable_stack.variable_count = 0;
 }
@@ -224,6 +224,8 @@ static void compile_assignment(Compiler *compiler) {
 static Type compile_type(Compiler *compiler) {
 	Token token = get_next_token(compiler->lexer);
 	switch (token.type) {
+		case TT_UNIT:
+			return TY_UNIT;
 		case TT_INTEGER:
 			return TY_INTEGER;
 		case TT_BOOLEAN:
@@ -244,6 +246,9 @@ static void compile_print(Compiler *compiler) {
 
 	Type type = pop_type(compiler);
 	switch (type) {
+                case TY_UNIT:
+			write_into_chunk(compiler->chunk, OP_PRINT_UNIT);
+                        break;
 		case TY_INTEGER:
 			write_into_chunk(compiler->chunk, OP_PRINT_INTEGER);
 			break;
@@ -428,6 +433,13 @@ static void compile_unary(Compiler *compiler) {
 			push_type(compiler, TY_BOOLEAN);
 			break;
 		}
+                case TT_UNIT: {
+                        get_next_token(compiler->lexer);
+                        write_into_chunk(chunk, OP_PUSH_INTEGER);
+                        write_into_chunk(chunk, 0);
+                        push_type(compiler, TY_UNIT);
+                        break;
+                }
 		case TT_LPAREN: {
 			get_next_token(compiler->lexer);
 			compile_expression(compiler);
@@ -471,8 +483,8 @@ static void compile_name(Compiler *compiler, Token token) {
 	write_into_chunk(compiler->chunk, i);
 }
 
-static void compile_call(Compiler *compiler, Token token) {
-	Function *f = find_function(&compiler->flist, &token);
+static void compile_call(Compiler *compiler, Token name) {
+	Function *f = find_function(&compiler->flist, &name);
 	if (f == NULL) {
 		error(compiler);
 		fprintf(stderr, "Name Error: Unknown Function\n");
@@ -481,6 +493,7 @@ static void compile_call(Compiler *compiler, Token token) {
 
 	match(compiler, TT_LPAREN);
 	int num_args = 0;
+        Token token = peek_next_token(compiler->lexer);
 	if (token.type != TT_RPAREN) {
 		compile_expression(compiler);
 		match_type(compiler, f->parameter_types[num_args++]);

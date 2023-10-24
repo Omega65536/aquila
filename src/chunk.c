@@ -24,94 +24,97 @@ void write_into_chunk(Chunk *chunk, uint32_t word) {
 }
 
 void print_chunk(Chunk *chunk) {
-	for (int i = 0; i < chunk->length; ++i) {
-		print_op_code(chunk, i);
+        int index = 0;
+        while (index < chunk->length) { 
+		index = print_op_code(chunk, index);
 	}
 }
 
-void print_op_code(Chunk *chunk, int index) {
+int print_op_code(Chunk *chunk, int index) {
 	printf("%-8d", index);
 	switch (chunk->code[index]) {
 		case OP_NOOP:
-			printf("NOOP");
-			break;
+			printf("NOOP\n");
+			return index + 1;
 		case OP_EXIT:
-			printf("EXIT");
-			break;
+			printf("EXIT\n");
+			return index + 1;
 		case OP_POP:
-			printf("POP");
-			break;
+			printf("POP\n");
+			return index + 1;
 		case OP_PUSH_INTEGER:
-			printf("PUSH_INTEGER %d", chunk->code[++index]);
-			break;
+			printf("PUSH_INTEGER %d\n", chunk->code[index + 1]);
+			return index + 2;
 		case OP_PUSH_TRUE:
-			printf("PUSH_TRUE");
-			break;
+			printf("PUSH_TRUE\n");
+			return index + 1;
 		case OP_PUSH_FALSE:
-			printf("PUSH_FALSE");
-			break;
+			printf("PUSH_FALSE\n");
+			return index + 1;
 		case OP_LOAD:
-			printf("LOAD %d", chunk->code[++index]);
-			break;
+			printf("LOAD %d\n", chunk->code[index + 1]);
+			return index + 2;
 		case OP_STORE:
-			printf("STORE %d", chunk->code[++index]);
-			break;
+			printf("STORE %d\n", chunk->code[index + 1]);
+			return index + 2;
+		case OP_PRINT_UNIT:
+			printf("PRINT_UNIT\n");
+			return index + 1;
 		case OP_PRINT_INTEGER:
-			printf("PRINT_INTEGER");
-			break;
+			printf("PRINT_INTEGER\n");
+			return index + 1;
 		case OP_PRINT_BOOLEAN:
-			printf("PRINT_BOOLEAN");
-			break;
+			printf("PRINT_BOOLEAN\n");
+			return index + 1;
 		case OP_ADD:
-			printf("ADD");
-			break;
+			printf("ADD\n");
+			return index + 1;
 		case OP_SUB:
-			printf("SUB");
-			break;
+			printf("SUB\n");
+			return index + 1;
 		case OP_MUL:
-			printf("MUL");
-			break;
+			printf("MUL\n");
+			return index + 1;
 		case OP_DIV:
-			printf("DIV");
-			break;
+			printf("DIV\n");
+			return index + 1;
 		case OP_NEGATE:
-			printf("NEGATE");
-			break;
+			printf("NEGATE\n");
+			return index + 1;
 		case OP_EQUAL:
-			printf("EQUAL");
-			break;
+			printf("EQUAL\n");
+			return index + 1;
 		case OP_NOT_EQUAL:
-			printf("NOT_EQUAL");
-			break;
+			printf("NOT_EQUAL\n");
+			return index + 1;
 		case OP_LESS:
-			printf("LESS");
-			break;
+			printf("LESS\n");
+			return index + 1;
 		case OP_LESS_EQUAL:
-			printf("LESS_EQUAL");
-			break;
+			printf("LESS_EQUAL\n");
+			return index + 1;
 		case OP_GREATER:
-			printf("GREATER");
-			break;
+			printf("GREATER\n");
+			return index + 1;
 		case OP_GREATER_EQUAL:
-			printf("GREATER_EQUAL");
-			break;
+			printf("GREATER_EQUAL\n");
+			return index + 1;
 		case OP_JUMP:
-			printf("JUMP %d", chunk->code[++index]);
-			break;
+			printf("JUMP %d\n", chunk->code[index + 1]);
+			return index + 2;
 		case OP_JUMP_IF_FALSE:
-			printf("JUMP_IF_FALSE %d", chunk->code[++index]);
-			break;
+			printf("JUMP_IF_FALSE %d\n", chunk->code[index + 1]);
+			return index + 2;
 		case OP_CALL:
-			printf("CALL %d %d", chunk->code[index + 1],
+			printf("CALL %d %d\n", chunk->code[index + 1],
 			       chunk->code[index + 2]);
-			index += 2;
-			break;
+			return index + 3;
 		case OP_RETURN:
-			printf("RETURN %d", chunk->code[++index]);
-			break;
+			printf("RETURN %d\n", chunk->code[index + 1]);
+			return index + 2;
 		default:
 			printf("UNKNOWN OP: %d", chunk->code[index]);
+                        return index + 1;
 			break;
 	}
-	printf("\n");
 }

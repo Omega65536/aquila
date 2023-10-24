@@ -74,6 +74,11 @@ int interpret(Interpreter *interpreter) {
 				*var_location = object;
 				break;
 			}
+			case OP_PRINT_UNIT: {
+				pop(interpreter);
+				printf("unit\n");
+				break;
+			}
 			case OP_PRINT_INTEGER: {
 				int value = pop(interpreter).integer;
 				printf("%d\n", value);

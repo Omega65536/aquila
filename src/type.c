@@ -3,6 +3,9 @@
 
 void print_type(FILE *file, Type type) {
 	switch (type) {
+                case TY_UNIT:
+                        fprintf(file, "Unit");
+                        break;
 		case TY_INTEGER:
 			fprintf(file, "Integer");
 			break;

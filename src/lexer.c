@@ -13,6 +13,7 @@ static const char *KW_IF = "if";
 static const char *KW_WHILE = "while";
 static const char *KW_TRUE = "true";
 static const char *KW_FALSE = "false";
+static const char *KW_UNIT = "unit";
 static const char *KW_INTEGER = "integer";
 static const char *KW_BOOLEAN = "boolean";
 
@@ -154,6 +155,8 @@ Token advance_lexer(Lexer *lexer) {
 			return make_token(lexer, TT_TRUE);
 		} else if (strncmp(name, KW_FALSE, strlen(KW_FALSE)) == 0) {
 			return make_token(lexer, TT_FALSE);
+		} else if (strncmp(name, KW_UNIT, strlen(KW_UNIT)) == 0) {
+			return make_token(lexer, TT_UNIT);
 		} else if (strncmp(name, KW_INTEGER, strlen(KW_INTEGER)) == 0) {
 			return make_token(lexer, TT_INTEGER);
 		} else if (strncmp(name, KW_BOOLEAN, strlen(KW_BOOLEAN)) == 0) {

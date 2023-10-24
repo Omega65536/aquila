@@ -9,8 +9,14 @@ func b(x: integer): integer {
     return x * x;
 }
 
+func c(): unit {
+    print(true);
+    return unit;
+}
+
 func main(): integer {
     print(a(1, true));
     print(b(5));
+    print(c());
     return 0;
 }
