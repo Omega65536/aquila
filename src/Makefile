@@ -13,7 +13,7 @@ clean:
 	rm -f aquila *.o
 
 check:
-	../tests/test.sh
+	../tests/run_tests.sh
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
