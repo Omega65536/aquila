@@ -32,6 +32,9 @@ void init_function_list(FunctionList *flist) {
 }
 
 void free_function_list(FunctionList *flist) {
+        for (int i = 0; i < flist->count; i++) {
+                free(flist->functions[i].parameter_types);
+        }
 	free(flist->functions);
 }
 

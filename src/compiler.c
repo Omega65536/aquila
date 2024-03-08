@@ -54,11 +54,12 @@ void init_compiler(Compiler *compiler, Lexer *lexer, Chunk *chunk) {
 
 void free_compiler(Compiler *compiler) {
 	free_variable_stack(&compiler->variable_stack);
+        free_function_list(&compiler->flist);
 }
 
 void compile(Compiler *compiler) {
 	write_into_chunk(compiler->chunk, OP_CALL);
-	write_into_chunk(compiler->chunk, -1);
+        int main_function_index = reserve_place_in_chunk(compiler->chunk);
 	write_into_chunk(compiler->chunk, 0);
 	write_into_chunk(compiler->chunk, OP_EXIT);
 
@@ -76,7 +77,7 @@ void compile(Compiler *compiler) {
 		fprintf(stderr, "No main function\n");
 		exit(EXIT_FAILURE);
 	}
-	compiler->chunk->code[1] = main->index;
+	compiler->chunk->code[main_function_index] = main->index;
 
 	// print_function_list(stdout, &compiler->flist);
 }
@@ -175,11 +176,7 @@ static void compile_return(Compiler *compiler, Type type) {
 	compile_expression(compiler);
 	match(compiler, TT_SEMICOLON);
 
-	Type ret_type = pop_type(compiler);
-	if (ret_type != type) {
-		error(compiler);
-		type_error(type, ret_type);
-	}
+        match_type(compiler, type);
 
 	write_into_chunk(compiler->chunk, OP_RETURN);
 	write_into_chunk(compiler->chunk,
@@ -199,11 +196,7 @@ static void compile_let(Compiler *compiler) {
 	compile_expression(compiler);
 	match(compiler, TT_SEMICOLON);
 
-	Type expression_type = pop_type(compiler);
-	if (expression_type != type) {
-		error(compiler);
-		type_error(type, expression_type);
-	}
+        match_type(compiler, type);
 
 	mark_initializied(&compiler->variable_stack);
 }
@@ -263,8 +256,7 @@ static void compile_if(Compiler *compiler, Type type) {
 	compile_expression(compiler);
 	match_type(compiler, TY_BOOLEAN);
 	write_into_chunk(compiler->chunk, OP_JUMP_IF_FALSE);
-	int dest_index = compiler->chunk->length;
-	write_into_chunk(compiler->chunk, -1);
+	int dest_index = reserve_place_in_chunk(compiler->chunk);
 	compile_block(compiler, type);
 	compiler->chunk->code[dest_index] = compiler->chunk->length;
 }
@@ -275,8 +267,7 @@ static void compile_while(Compiler *compiler, Type type) {
 	compile_expression(compiler);
 	match_type(compiler, TY_BOOLEAN);
 	write_into_chunk(compiler->chunk, OP_JUMP_IF_FALSE);
-	int dest_index = compiler->chunk->length;
-	write_into_chunk(compiler->chunk, -1);
+	int dest_index = reserve_place_in_chunk(compiler->chunk);
 	compile_block(compiler, type);
 	write_into_chunk(compiler->chunk, OP_JUMP);
 	write_into_chunk(compiler->chunk, entry_index);

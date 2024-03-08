@@ -27,6 +27,15 @@ void write_into_chunk(Chunk *chunk, uint32_t word) {
 	chunk->length++;
 }
 
+int reserve_place_in_chunk(Chunk *chunk) {
+	if (chunk->length == chunk->capacity) {
+		chunk->capacity *= 2;
+		chunk->code =
+		    realloc(chunk->code, chunk->capacity * sizeof(uint32_t));
+	}
+        return chunk->length++;
+}
+
 void print_chunk(Chunk *chunk) {
         int index = 0;
         while (index < chunk->length) { 

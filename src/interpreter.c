@@ -25,6 +25,7 @@ void init_interpreter(Interpreter *interpreter, Chunk *chunk) {
 
 void free_interpreter(Interpreter *interpreter) {
 	free(interpreter->stack);
+	free(interpreter->frames);
 }
 
 int interpret(Interpreter *interpreter) {

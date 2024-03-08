@@ -49,6 +49,7 @@ extern const int AQ_FALSE;
 void init_chunk(Chunk *chunk);
 void free_chunk(Chunk *chunk);
 void write_into_chunk(Chunk *chunk, uint32_t word);
+int reserve_place_in_chunk(Chunk *chunk);
 void print_chunk(Chunk *chunk);
 int print_op_code(Chunk *chunk, int index);
 
